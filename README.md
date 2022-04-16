@@ -1,1 +1,13 @@
 # TeSyL
+## **Te**rrible **Sy**ntax **L**anguage
+
+*TeSyL* is a project concerning creating a interpreted language in *Rust*, with a terribly conveluted syntax. The project is intended as a learning experience to gain a fundemental understanding of the Rust programming Language, as well as to explore the design challenges of implementing a programming language.
+
+The project consists of several parts, and may be updated even further as the projects is developed: 
+* Lexing of .tsl program files
+* Parsing the lexed tokens to build the AST
+* Interpreting the provided AST
+* Optimizations
+* ...
+
+
