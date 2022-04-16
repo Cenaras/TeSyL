@@ -1,4 +1,3 @@
-
 pub enum TOKENS {
     PLUS,
     MINUS,
@@ -9,5 +8,5 @@ pub enum TOKENS {
     EQUAL,
     SEMICOLON,
     IntLit(u32),
+    EOF,
 }
-
