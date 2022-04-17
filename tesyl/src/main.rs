@@ -1,5 +1,10 @@
-mod tokens; // Using the module tokens
-use tokens::TOKENS; // Shorthanding tokens::TOKENS to just TOKENS
+#![allow(unused_parens)]
+#![allow(unused_variables)]
+
+mod tokens;
+
+// Using the module tokens
+use tokens::Tokens; // Shorthanding tokens::TOKENS to just TOKENS
 
 mod lexer;
 use lexer::Lexer; // Must be possible to avoid doing this double stuff
@@ -13,16 +18,19 @@ fn main() {
 
     let lexer = Lexer::new(filename).unwrap();
     println!("Raw data is: {}", lexer.raw);
-    
+    let tokens = lexer.lex();
+    printTokens(tokens);
+
+
     //let stream of tokens = lexer.run();
 
     test_stuff();
 }
 
 fn test_stuff() {
-    let intlit = TOKENS::IntLit(2);
+    let intlit = Tokens::IntLit(2);
     let result = match intlit {
-        TOKENS::IntLit(value) => Some(value),
+        Tokens::IntLit(value) => Some(value),
         _ => None,
     };
 
@@ -33,3 +41,12 @@ fn test_stuff() {
 
     // Test read file, stream/vec of tokens, ...
 }
+
+fn printTokens(tokens: Vec<Tokens>) {
+    println!("Tokens are: ");
+    for token in tokens {
+        print!("{}", token);
+    }
+    println!();
+}
+
