@@ -8,6 +8,9 @@ The project consists of several parts, and may be updated even further as the pr
 * Parsing the lexed tokens to build the AST
 * Interpreting the provided AST
 * Optimizations
-* ...
+* ...  
 
+## Grammar
+The grammar of TeSyL follows an functional style where everything is an expression, and thus the entire program is simply an expression.
 
+*The grammar will be displayed here, once it is ready*

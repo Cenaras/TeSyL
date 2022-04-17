@@ -21,7 +21,6 @@ fn main() {
     let tokens = lexer.lex();
     printTokens(tokens);
 
-
     //let stream of tokens = lexer.run();
 
     test_stuff();
@@ -49,4 +48,3 @@ fn printTokens(tokens: Vec<Tokens>) {
     }
     println!();
 }
-

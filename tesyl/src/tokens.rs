@@ -1,3 +1,4 @@
+#[derive(PartialEq)]
 pub enum Tokens {
     PLUS,
     MINUS,
@@ -7,12 +8,12 @@ pub enum Tokens {
     LE,
     EQUAL,
     SEMICOLON,
-    IntLit(i32),
+    IntLit(u32),
     EOF,
+    PLACEHOLDER_TYPE,
 }
 
-use std::fmt::{self, write};
-
+use std::fmt::{self};
 
 impl fmt::Display for Tokens {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -21,6 +22,7 @@ impl fmt::Display for Tokens {
             Tokens::MINUS => write!(f, " [MINUS] "),
             Tokens::IntLit(val) => write!(f, "[IntLit({})]", val),
             Tokens::EOF => write!(f, "[EOF]"),
+            Tokens::PLACEHOLDER_TYPE => write!(f, "_"),
             _ => write!(f, "Not Implemented"),
         }
     }
