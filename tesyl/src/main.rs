@@ -16,12 +16,15 @@ fn main() {
     let mut args = std::env::args().skip(1);
     let filename = args.next().expect("No file was specified");
 
+    assert_correct_format(&filename);
+
     let lexer = Lexer::new(filename).unwrap();
     println!("Raw data is: {}", lexer.raw);
     let tokens = lexer.lex();
+    
+    // ### TEST ENVIRONMENT ###
+    
     printTokens(tokens);
-
-    //let stream of tokens = lexer.run();
 
     test_stuff();
 }
@@ -48,3 +51,12 @@ fn printTokens(tokens: Vec<Tokens>) {
     }
     println!();
 }
+
+
+// Assert the format of the arguments are correct. We do not need to own the variable, a slice is sufficient
+fn assert_correct_format(file: &String) {
+    if (!file.ends_with(".tsl")) {
+        panic!("File does not end in .tsl, which is the expected format");
+    }
+}
+

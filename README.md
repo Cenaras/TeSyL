@@ -13,4 +13,10 @@ The project consists of several parts, and may be updated even further as the pr
 ## Grammar
 The grammar of TeSyL follows an functional style where everything is an expression, and thus the entire program is simply an expression.
 
-*The grammar will be displayed here, once it is ready*
+Program := Exp
+
+Exp := Int | Exp OP Exp |  
+Int := 1 | 2 | 3 | ...  
+OP = + | - | * | / | > | < | =
+
+*The grammar will be displayed here, once it is ready. The grammar is a work in progress.*
