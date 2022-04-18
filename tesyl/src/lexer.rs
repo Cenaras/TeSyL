@@ -1,8 +1,8 @@
 #![allow(unused_parens)]
 #![allow(unused_variables)]
 
-use crate::tokens::Tokens;
-use std::str::Chars;
+use crate::tokens::Token;
+use std::{str::Chars, iter::Peekable};
 
 // Lexer stores the raw file data
 pub struct Lexer {
@@ -18,9 +18,9 @@ impl Lexer {
         Ok(Lexer { raw: contents })
     }
 
-    pub fn lex(&self) -> Vec<Tokens> {
-        let mut tokens_list: Vec<Tokens> = Vec::new();
-        let mut iter = self.raw.chars().into_iter();
+    pub fn lex(&self) -> Vec<Token> {
+        let mut tokens_list: Vec<Token> = Vec::new();
+        let mut iter = self.raw.chars().into_iter().peekable();
 
         // Iterate over everything and create tokens
 
@@ -35,11 +35,11 @@ impl Lexer {
         let mut next_token = get_token(&mut iter);
 
         loop {
-            if next_token != Tokens::EOF {
+            if next_token != Token::EOF {
                 tokens_list.push(next_token);
                 next_token = get_token(&mut iter);
             } else {
-                tokens_list.push(Tokens::EOF);
+                tokens_list.push(Token::EOF);
                 break;
             }
         }
@@ -49,39 +49,91 @@ impl Lexer {
 }
 
 // Parses a token. Skips whitespace, and delegates complicated parsing to other functions
-fn get_token(iter: &mut Chars) -> Tokens {
-    let current_char = iter.next();
+fn get_token(iter: &mut Peekable<Chars>) -> Token {
 
-    match current_char {
-        None => Tokens::EOF,
-        Some(c) => {
-            // If char is skipable, call recursively on next char
-            if (skipable(c)) {
-                return get_token(iter);
+    // Code is not very well written. Benchmark bad lexer, return and optimize to see difference.
+
+    // Peek next: If None, return EOF, else lex next char
+    while(iter.peek() != None) {
+        
+        let mut cur = iter.next().unwrap();
+        println!("Saw token {}", cur);
+        // Disregard whitespaces - if last is whitespace, return
+        while (skipable(&cur)) {
+            println!("Skip");
+            if (iter.peek() != None) {
+                cur = iter.next().unwrap();
+            } else {
+                return Token::EOF;
             }
-            if (c.is_numeric()) {
-                return Tokens::IntLit(c.to_digit(10).unwrap());
+        }
+
+        // If we see number, keep consuming numbers.
+        if (cur.is_numeric()) {
+            let mut acc = String::from(cur);
+            while(isDigit(iter.peek())) {
+                let val = iter.next().unwrap();
+                println!("Val is {}", val);
+                if (val.is_numeric()) {
+                    acc.push(val)
+                }
             }
-            // Else return the current token
-            return match c {
-                '+' => Tokens::PLUS,
-                '-' => Tokens::MINUS,
-                '*' => Tokens::TIMES,
-                '/' => Tokens::DIVIDE,
-                ';' => Tokens::SEMICOLON,
-                '>' => Tokens::GE,
-                '<' => Tokens::LE,
-                '=' => Tokens::EQUAL,
-                _ => Tokens::PLACEHOLDER_TYPE,
+
+            return Token::IntLit(acc.parse().unwrap());
+        }
+        else {
+            return match cur {
+                '+' => Token::PLUS,
+                '-' => Token::MINUS,
+                '*' => Token::TIMES,
+                '/' => Token::DIVIDE,
+                ';' => Token::SEMICOLON,
+                '>' => Token::GE,
+                '<' => Token::LE,
+                '=' => Token::EQUAL,
+                _ => Token::PLACEHOLDER_TYPE,
             };
         }
     }
+    return Token::EOF;
 }
 
+
 // Determine if current char is skipable
-fn skipable(c: char) -> bool {
+fn skipable(c: &char) -> bool {
     if c.is_whitespace() {
         return true;
     }
     return false;
 }
+
+
+fn isDigit(c: Option<&char>) -> bool {
+    return match c {
+        None => false,
+        Some(i) => i.is_numeric(),
+    }
+}
+
+//fn read_number(iter: &mut Peekable<Chars>) -> Token {
+    //let mut val = iter.next().unwrap();
+    // loop {
+    //     match iter.next() {
+    //         Some(char) => {
+    //             if c.is_numeric() {
+    //                 println!("Char is {}", char);
+    //                 val.push(char)
+    //             } else {
+    //                 println!("Result is {}", val);
+    //                 return Token::IntLit(val.parse().unwrap());
+    //             }
+    //         }
+    //         // Always expcet a valid formed intlit here.
+    //         None => {
+    //             println!("Val is {}", val);
+    //             return Token::IntLit(val.parse().unwrap());
+    //         }
+    //     }
+    // }
+    //return Token::PLACEHOLDER_TYPE;
+//}

@@ -4,7 +4,7 @@
 mod tokens;
 
 // Using the module tokens
-use tokens::Tokens; // Shorthanding tokens::TOKENS to just TOKENS
+use tokens::Token; // Shorthanding tokens::TOKENS to just TOKENS
 
 mod lexer;
 use lexer::Lexer; // Must be possible to avoid doing this double stuff
@@ -19,32 +19,20 @@ fn main() {
     assert_correct_format(&filename);
 
     let lexer = Lexer::new(filename).unwrap();
-    println!("Raw data is: {}", lexer.raw);
     let tokens = lexer.lex();
-    
-    // ### TEST ENVIRONMENT ###
-    
-    printTokens(tokens);
 
-    test_stuff();
+    // ### TEST ENVIRONMENT ###
+
+    print_tokens(tokens);
+
+    //test_stuff();
 }
 
 fn test_stuff() {
-    let intlit = Tokens::IntLit(2);
-    let result = match intlit {
-        Tokens::IntLit(value) => Some(value),
-        _ => None,
-    };
 
-    println!("The value is: {}", result.unwrap());
-
-    //let lexer = Lexer::new("test".to_string());
-    //println!("Lexer raw: {}", lexer.raw)
-
-    // Test read file, stream/vec of tokens, ...
 }
 
-fn printTokens(tokens: Vec<Tokens>) {
+fn print_tokens(tokens: Vec<Token>) {
     println!("Tokens are: ");
     for token in tokens {
         print!("{}", token);
@@ -52,11 +40,9 @@ fn printTokens(tokens: Vec<Tokens>) {
     println!();
 }
 
-
 // Assert the format of the arguments are correct. We do not need to own the variable, a slice is sufficient
 fn assert_correct_format(file: &String) {
     if (!file.ends_with(".tsl")) {
         panic!("File does not end in .tsl, which is the expected format");
     }
 }
-

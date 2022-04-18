@@ -1,5 +1,5 @@
 #[derive(PartialEq)]
-pub enum Tokens {
+pub enum Token {
     PLUS,
     MINUS,
     TIMES,
@@ -15,14 +15,14 @@ pub enum Tokens {
 
 use std::fmt::{self};
 
-impl fmt::Display for Tokens {
+impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match &*self {
-            Tokens::PLUS => write!(f, " [PLUS] "),
-            Tokens::MINUS => write!(f, " [MINUS] "),
-            Tokens::IntLit(val) => write!(f, "[IntLit({})]", val),
-            Tokens::EOF => write!(f, "[EOF]"),
-            Tokens::PLACEHOLDER_TYPE => write!(f, "_"),
+            Token::PLUS => write!(f, " [PLUS] "),
+            Token::MINUS => write!(f, " [MINUS] "),
+            Token::IntLit(val) => write!(f, "[IntLit({})]", val),
+            Token::EOF => write!(f, "[EOF]"),
+            Token::PLACEHOLDER_TYPE => write!(f, "_"),
             _ => write!(f, "Not Implemented"),
         }
     }
