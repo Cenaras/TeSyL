@@ -2,7 +2,9 @@
 #![allow(unused_variables)]
 
 use crate::tokens::Token;
-use std::{iter::Peekable, str::Chars};
+use std::{iter::Peekable, str::Chars, collections::HashMap};
+
+// TODO: Store Iterator instead of raw data, every method using iter is then in impl Lexer.
 
 // Lexer stores the raw file data
 pub struct Lexer {
@@ -15,22 +17,16 @@ impl Lexer {
     // Init new lexer, return error if file not present
     pub fn new(program: String) -> Result<Lexer, std::io::Error> {
         let contents = std::fs::read_to_string(program)?;
-        Ok(Lexer { raw: contents })
+        Ok(Lexer { raw: contents})
     }
 
     pub fn lex(&self) -> Vec<Token> {
         let mut tokens_list: Vec<Token> = Vec::new();
         let mut iter = self.raw.chars().into_iter().peekable();
 
+        // TODO: Create vec of keywords so we know if token is keyword or not.
+
         // Iterate over everything and create tokens
-
-        // While iter.next is Some: Parse the value, get the tokens
-        // If iter.next = None, get the EOF token and return
-
-        /*let next_token = match iter.next() {
-        //    Some(char) => Tokens::PLUS, //TODO: Actually parse stuff here
-        //    None => Tokens::EOF, // Iterate over tokens instead.
-         }; */
 
         let mut next_token = get_token(&mut iter);
 
@@ -71,6 +67,8 @@ fn get_token(iter: &mut Peekable<Chars>) -> Token {
 
         // Parse identifier here
         } else if (cur.is_alphanumeric()) {
+            return read_identifier(cur, iter);
+
 
         } else {
             return match cur {
@@ -97,11 +95,20 @@ fn skipable(c: &char) -> bool {
     return false;
 }
 
+/* ##### Create pretty way to avoid code duplication with Option vs unwrapped value for these ##### */
+
 fn is_digit(c: Option<&char>) -> bool {
     return match c {
         None => false,
         Some(i) => i.is_numeric(),
     };
+}
+
+fn is_identifier_symbol(c: Option<&char>) -> bool {
+    return match c {
+        None => false,
+        Some(val) => val.is_alphabetic() || val.is_numeric(),
+    }
 }
 
 
@@ -118,25 +125,29 @@ fn read_number(cur: char, iter: &mut Peekable<Chars>) -> Token{
     return Token::IntLit(acc.parse().unwrap());
 }
 
-//fn read_number(iter: &mut Peekable<Chars>) -> Token {
-//let mut val = iter.next().unwrap();
-// loop {
-//     match iter.next() {
-//         Some(char) => {
-//             if c.is_numeric() {
-//                 println!("Char is {}", char);
-//                 val.push(char)
-//             } else {
-//                 println!("Result is {}", val);
-//                 return Token::IntLit(val.parse().unwrap());
-//             }
-//         }
-//         // Always expcet a valid formed intlit here.
-//         None => {
-//             println!("Val is {}", val);
-//             return Token::IntLit(val.parse().unwrap());
-//         }
-//     }
-// }
-//return Token::PLACEHOLDER_TYPE;
-//}
+fn read_identifier(cur: char, iter: &mut Peekable<Chars>) -> Token {
+    let mut acc = String::from(cur);
+    
+    //Benchmark creating everytime vs only once - bad, but on purpose for benchmarking
+    let mut keywords = HashMap::from([
+        (String::from("let"), Token::LET),
+        (String::from("if"),Token::IF),
+        (String::from("then"), Token::THEN),
+        (String::from("else"), Token::ELSE),
+    ]); 
+    
+    while(is_identifier_symbol(iter.peek())) {
+        let next = iter.next().unwrap();
+        if (next.is_alphabetic() || next.is_numeric()) {
+            acc.push(next);
+        }
+    }
+
+
+    // Creating every time and removing entry - benchmark property
+    return match keywords.remove(&acc) {
+        Some(token) => token,
+        None => Token::Identifier(acc)
+    };
+}
+

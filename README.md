@@ -15,9 +15,9 @@ The grammar of TeSyL follows an functional style where everything is an expressi
 
 Program := Exp
 
-Exp := Int | Exp OP Exp |  
+Exp := Int; | Exp OP Exp; | Let Exp = Exp; | If Exp then Exp else Exp; |  
 Int := 1 | 2 | 3 | ...  
-OP = + | - | * | / | > | < | =
+OP := + | - | * | / | > | < | =
 
 *The grammar will be displayed here, once it is ready. The grammar is a work in progress.*
 

@@ -9,7 +9,12 @@ pub enum Token {
     EQUAL,
     SEMICOLON,
     IntLit(u32),
+    Identifier(String),
     EOF,
+    LET,
+    IF,
+    THEN,
+    ELSE,
     INVALID,
 }
 
@@ -20,8 +25,18 @@ impl fmt::Display for Token {
         match &*self {
             Token::PLUS => write!(f, "[PLUS] "),
             Token::MINUS => write!(f, "[MINUS] "),
+            Token::TIMES => write!(f, "[TIMES] "),
+            Token::DIVIDE => write!(f, "[DIVIDE] "),
+            Token::GE => write!(f, "[GE] "),
+            Token::LE => write!(f, "[LE] "),
+            Token::EQUAL => write!(f, "[EQUAL] "),
             Token::IntLit(val) => write!(f, "[IntLit({})] ", val),
+            Token::Identifier(name) => write!(f, "[IDENTIFIER({})] ", name),
             Token::EOF => write!(f, "[EOF] "),
+            Token::LET => write!(f, "[LET] "),
+            Token::IF => write!(f, "[IF] "),
+            Token::THEN => write!(f, "[THEN] "),
+            Token::ELSE => write!(f, "[ELSE] "),
             Token::INVALID => write!(f, "[INVALID] "),
             _ => write!(f, "Not Implemented "),
         }
