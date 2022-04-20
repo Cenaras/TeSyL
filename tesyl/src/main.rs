@@ -25,12 +25,10 @@ fn main() {
 
     print_tokens(tokens);
 
-    //test_stuff();
+    test_stuff();
 }
 
-fn test_stuff() {
-
-}
+fn test_stuff() {}
 
 fn print_tokens(tokens: Vec<Token>) {
     println!("Tokens are: ");
