@@ -20,3 +20,16 @@ Int := 1 | 2 | 3 | ...
 OP = + | - | * | / | > | < | =
 
 *The grammar will be displayed here, once it is ready. The grammar is a work in progress.*
+
+### Remaining Work:
+ * Construct (minimal) Grammar
+ * Implement minimal lexer
+ * Implement minimal parser
+ * Implement minimal interpreter
+ * Expand Lexer, Parser, Interpreter
+ * Optimization/Benchmarking work
+    * Ownership / Borrowing of values
+    * Efficient implementations
+    * Interpreter optimization
+        * Eval of zero-child, ...
+
