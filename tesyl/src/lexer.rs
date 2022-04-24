@@ -1,8 +1,9 @@
 #![allow(unused_parens)]
 #![allow(unused_variables)]
 
-use crate::tokens::Token;
+use crate::tokens::Token; //add ::* and remove TOKEN::?
 use std::{iter::Peekable, str::Chars, collections::HashMap};
+
 
 // TODO: Store Iterator instead of raw data, every method using iter is then in impl Lexer.
 
