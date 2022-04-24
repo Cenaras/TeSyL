@@ -29,7 +29,7 @@ fn main() {
 
     let mut parser = Parser::new(lexer.lex());
     let program = parser.parse_program();
-    print_program(&program);
+    print_program(&program.unwrap());
 }
 
 pub fn print_tokens(tokens: &Vec<Token>) {

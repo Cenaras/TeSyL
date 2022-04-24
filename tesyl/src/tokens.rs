@@ -27,7 +27,7 @@ pub enum Token {
 
 */
 
-pub fn bin_op_precedence(op: Token) -> i32 {
+pub fn bin_op_precedence(op: &Token) -> i32 {
     match op {
         Token::PLUS | Token::MINUS => 10,
         Token::TIMES | Token::DIVIDE => 20,

@@ -1,3 +1,4 @@
+use crate::ast::bin_op_exp_from_token;
 use crate::tokens::bin_op_precedence;
 use crate::{ast::BinOp, Exp};
 use std::vec::IntoIter;
@@ -23,8 +24,10 @@ impl Parser {
         }
     }
 
-    pub fn parse_program(&mut self) -> Exp {
-        self.parse_bin_op() // can only handle bin op for now
+    pub fn parse_program(&mut self) -> Result<Exp, ErrorType> {
+        //self.parse_bin_op() // can only handle bin op for now
+        let result =  self.parse_exp()?;
+        Ok(result)
     }
 
     fn parse_bin_op(&mut self) -> Exp {
@@ -49,8 +52,8 @@ impl Parser {
 
     // ##### TESTING STUFF #####
     fn parse_exp(&mut self) -> Result<Exp, ErrorType> {
-        let left = self.parse_base_exp()?;
-        Ok(Exp::Undefined)
+        let mut left = self.parse_base_exp()?;
+        self.parse_exp_left_to_right(left, 0)
     }
 
     fn parse_base_exp(&mut self) -> Result<Exp, ErrorType> {
@@ -62,12 +65,20 @@ impl Parser {
 
     fn parse_exp_left_to_right(
         &mut self,
-        left: Exp,
-        min_precedence: u32,
+        mut left: Exp,
+        min_precedence: i32,
     ) -> Result<Exp, ErrorType> {
-        let lookahead = self.tokens.next().unwrap();
-        let right = self.parse_base_exp()?;
-        let test = bin_op_precedence(lookahead);
+        let mut lookahead = self.tokens.next().unwrap();
+        while(bin_op_precedence(&lookahead) >= min_precedence) {
+            let op = self.tokens.next().unwrap();
+            let mut right = self.parse_base_exp()?;
+            lookahead = self.tokens.next().unwrap();
+            while(bin_op_precedence(&lookahead) > bin_op_precedence(&op)) {
+                right = self.parse_exp_left_to_right(right, bin_op_precedence(&op) + 1)?;
+                lookahead = self.tokens.next().unwrap();
+            }
+            left = Exp::BinOpExp(Box::new(left), bin_op_exp_from_token(&op), Box::new(right));
+        }
 
         Ok(Exp::Undefined)
     }

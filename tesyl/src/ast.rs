@@ -2,6 +2,7 @@
 // size on stack, since recursion gives infinite size. Therefore wrap in Box which then stores on heap.
 // Box<T> is a pointer (fixed size) to the heap, where we can have dynamic size.
 use std::fmt::{self};
+use crate::tokens::Token;
 type id = String;
 
 pub enum Exp {
@@ -19,6 +20,17 @@ pub enum BinOp {
     DivideBinOp,
     Undefined,
 }
+
+pub fn bin_op_exp_from_token(token: &Token) -> BinOp {
+    match token {
+        Token::PLUS => BinOp::PlusBinOp,
+        Token::MINUS => BinOp::MinusBinOp,
+        Token::TIMES => BinOp::TimesBinOp,
+        Token::DIVIDE => BinOp::DivideBinOp,
+        _ => BinOp::Undefined
+    }
+}
+
 
 impl fmt::Display for Exp {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
