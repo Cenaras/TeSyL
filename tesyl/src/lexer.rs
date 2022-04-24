@@ -2,8 +2,7 @@
 #![allow(unused_variables)]
 
 use crate::tokens::Token; //add ::* and remove TOKEN::?
-use std::{iter::Peekable, str::Chars, collections::HashMap};
-
+use std::{collections::HashMap, iter::Peekable, str::Chars};
 
 // TODO: Store Iterator instead of raw data, every method using iter is then in impl Lexer.
 
@@ -18,7 +17,7 @@ impl Lexer {
     // Init new lexer, return error if file not present
     pub fn new(program: String) -> Result<Lexer, std::io::Error> {
         let contents = std::fs::read_to_string(program)?;
-        Ok(Lexer { raw: contents})
+        Ok(Lexer { raw: contents })
     }
 
     pub fn lex(&self) -> Vec<Token> {
@@ -69,8 +68,6 @@ fn get_token(iter: &mut Peekable<Chars>) -> Token {
         // Parse identifier here
         } else if (cur.is_alphanumeric()) {
             return read_identifier(cur, iter);
-
-
         } else {
             return match cur {
                 '+' => Token::PLUS,
@@ -109,11 +106,10 @@ fn is_identifier_symbol(c: Option<&char>) -> bool {
     return match c {
         None => false,
         Some(val) => val.is_alphabetic() || val.is_numeric(),
-    }
+    };
 }
 
-
-fn read_number(cur: char, iter: &mut Peekable<Chars>) -> Token{
+fn read_number(cur: char, iter: &mut Peekable<Chars>) -> Token {
     let mut acc = String::from(cur);
 
     while (is_digit(iter.peek())) {
@@ -128,27 +124,25 @@ fn read_number(cur: char, iter: &mut Peekable<Chars>) -> Token{
 
 fn read_identifier(cur: char, iter: &mut Peekable<Chars>) -> Token {
     let mut acc = String::from(cur);
-    
+
     //Benchmark creating everytime vs only once - bad, but on purpose for benchmarking
     let mut keywords = HashMap::from([
         (String::from("let"), Token::LET),
-        (String::from("if"),Token::IF),
+        (String::from("if"), Token::IF),
         (String::from("then"), Token::THEN),
         (String::from("else"), Token::ELSE),
-    ]); 
-    
-    while(is_identifier_symbol(iter.peek())) {
+    ]);
+
+    while (is_identifier_symbol(iter.peek())) {
         let next = iter.next().unwrap();
         if (next.is_alphabetic() || next.is_numeric()) {
             acc.push(next);
         }
     }
 
-
     // Creating every time and removing entry - benchmark property
     return match keywords.remove(&acc) {
         Some(token) => token,
-        None => Token::Identifier(acc)
+        None => Token::Identifier(acc),
     };
 }
-

@@ -14,7 +14,6 @@ use parser::Parser;
 mod ast;
 use ast::*;
 
-
 // Path is from current terminal path. Call from root of project
 
 fn main() {
@@ -28,18 +27,9 @@ fn main() {
     let tokens = lexer.lex();
     // ### TEST ENVIRONMENT ###
 
-    print_tokens(&tokens);
-
-    test_stuff();
-
-    let parser = Parser::new(lexer.lex());
-
-}
-
-fn test_stuff() {
-
-    let test = Exp::BinOpExp(Box::new(Exp::IntExp(2)), BinOp::PlusBinOp, Box::new(Exp::IntExp(2)));
-
+    let mut parser = Parser::new(lexer.lex());
+    let program = parser.parse_program();
+    print_program(&program);
 }
 
 pub fn print_tokens(tokens: &Vec<Token>) {
@@ -48,6 +38,11 @@ pub fn print_tokens(tokens: &Vec<Token>) {
         print!("{}", token);
     }
     println!();
+}
+
+fn print_program(program: &Exp) {
+    println!("AST for program is: ");
+    println!("{}", program);
 }
 
 // Assert the format of the arguments are correct. We do not need to own the variable, a slice is sufficient
