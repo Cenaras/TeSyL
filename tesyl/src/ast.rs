@@ -37,6 +37,7 @@ impl fmt::Display for Exp {
         match &*self {
             Exp::BinOpExp(left, op, right) => write!(f, "BinOpExp({}, {}, {}) ", left, op, right),
             Exp::IntExp(v) => write!(f, "IntExp({})", v),
+            Exp::Undefined => write!(f, "Undefined"),
             _ => write!(f, "Not Implemented "),
         }
     }

@@ -2,13 +2,15 @@ use crate::ast::bin_op_exp_from_token;
 use crate::tokens::bin_op_precedence;
 use crate::{ast::BinOp, Exp};
 use std::vec::IntoIter;
-use std::{collections::binary_heap::Iter, iter::Peekable};
+use std::{iter::Peekable};
 //TODO: Add sequence to grammar?
 use crate::{print_tokens, Token};
 
 type TokenIter = Peekable<IntoIter<Token>>;
 type ErrorType = &'static str;
 //TODO: Probably result types instead - also nice way of parsing.
+// Also: Eat tokens when they're peeked, in functions
+
 
 pub struct Parser {
     tokens: TokenIter,
@@ -45,14 +47,17 @@ impl Parser {
 
     fn parse_int_lit(&mut self) -> Result<Exp, ErrorType> {
         match self.tokens.peek().unwrap() {
-            Token::IntLit(v) => Ok(Exp::IntExp(v.clone())),
+            Token::IntLit(v) => {
+                Ok(Exp::IntExp(v.clone()))
+            },
             _ => Err("Unable to parse expression"),
         }
     }
 
     // ##### TESTING STUFF #####
     fn parse_exp(&mut self) -> Result<Exp, ErrorType> {
-        let mut left = self.parse_base_exp()?;
+        let left = self.parse_base_exp()?;
+        self.tokens.next(); //eat
         self.parse_exp_left_to_right(left, 0)
     }
 
@@ -70,8 +75,11 @@ impl Parser {
     ) -> Result<Exp, ErrorType> {
         let mut lookahead = self.tokens.next().unwrap();
         while(bin_op_precedence(&lookahead) >= min_precedence) {
-            let op = self.tokens.next().unwrap();
+            let op = lookahead;
             let mut right = self.parse_base_exp()?;
+            
+            self.tokens.next(); //eat
+
             lookahead = self.tokens.next().unwrap();
             while(bin_op_precedence(&lookahead) > bin_op_precedence(&op)) {
                 right = self.parse_exp_left_to_right(right, bin_op_precedence(&op) + 1)?;
@@ -79,8 +87,7 @@ impl Parser {
             }
             left = Exp::BinOpExp(Box::new(left), bin_op_exp_from_token(&op), Box::new(right));
         }
-
-        Ok(Exp::Undefined)
+        Ok(left)
     }
 
     // ##### TESTING STUFF #####
@@ -107,3 +114,28 @@ impl Parser {
 
     */
 }
+
+/*
+#[macro_export]
+macro_rules! peek_op_or_err {
+    ($self:ident) => {
+        match $self.tokens.peek() {
+            Some(Token::PLUS) => BinOp::PlusBinOp,
+            _ => return Err("Expected a symbol"),
+        }
+    };
+}
+use crate::peek_literal_or_err;
+
+#[macro_export]
+macro_rules! peek_literal_or_err {
+    ($self:ident) => {
+        match $self.tokens.peek() {
+            Some(Token::IntLit(value)) => Exp::IntExp(value.clone()),
+            _ => return Err("Expected a literal"),
+        }
+    };
+}
+
+*/
+
