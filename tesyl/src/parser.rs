@@ -27,46 +27,39 @@ impl Parser {
     }
 
     pub fn parse_program(&mut self) -> Result<Exp, ErrorType> {
-        //self.parse_bin_op() // can only handle bin op for now
         let result =  self.parse_exp()?;
         Ok(result)
     }
 
-    fn parse_bin_op(&mut self) -> Exp {
-        let left = self.parse_int_lit().unwrap(); // can only handle simple bin ops
-        self.tokens.next(); // eat peeked token
-        let op = match self.tokens.peek() {
-            Some(Token::PLUS) => BinOp::PlusBinOp,
-            _ => BinOp::Undefined,
-        };
-        self.tokens.next();
-        let right = self.parse_int_lit().unwrap();
-        self.tokens.next();
-        Exp::BinOpExp(Box::new(left), op, Box::new(right))
-    }
-
     fn parse_int_lit(&mut self) -> Result<Exp, ErrorType> {
-        match self.tokens.peek().unwrap() {
+        let lit = match self.tokens.peek().unwrap() {
             Token::IntLit(v) => {
                 Ok(Exp::IntExp(v.clone()))
             },
             _ => Err("Unable to parse expression"),
-        }
+        };
+        self.tokens.next(); // eat
+        lit
     }
 
     // ##### TESTING STUFF #####
     fn parse_exp(&mut self) -> Result<Exp, ErrorType> {
         let left = self.parse_base_exp()?;
-        self.tokens.next(); //eat
         self.parse_exp_left_to_right(left, 0)
     }
 
+    // Base exps is a non-binop expression
     fn parse_base_exp(&mut self) -> Result<Exp, ErrorType> {
-        match self.tokens.peek() {
-            Some(Token::IntLit(_)) => self.parse_int_lit(),
+        let base = match self.tokens.peek() {
+            Some(Token::IntLit(_)) => self.parse_int_lit(), // int lit already eats
             _ => Err("Error"),
-        }
+        };
+        base
     }
+
+    // TODO: Allow base exps to be parsed such as LetExp: Break out of parse_left_to_right if the precedence if below current?
+    // Break out = just return left exp
+
 
     fn parse_exp_left_to_right(
         &mut self,
@@ -78,7 +71,7 @@ impl Parser {
             let op = lookahead;
             let mut right = self.parse_base_exp()?;
             
-            self.tokens.next(); //eat
+            //self.tokens.next(); //eat
 
             lookahead = self.tokens.next().unwrap();
             while(bin_op_precedence(&lookahead) > bin_op_precedence(&op)) {
