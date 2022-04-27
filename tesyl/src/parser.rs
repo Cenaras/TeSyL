@@ -1,6 +1,7 @@
 use crate::ast::bin_op_exp_from_token;
 use crate::tokens::bin_op_precedence;
 use crate::{ast::BinOp, Exp};
+use core::panic;
 use std::vec::IntoIter;
 use std::{iter::Peekable};
 //TODO: Add sequence to grammar?
@@ -10,6 +11,7 @@ type TokenIter = Peekable<IntoIter<Token>>;
 type ErrorType = &'static str;
 //TODO: Probably result types instead - also nice way of parsing.
 // Also: Eat tokens when they're peeked, in functions
+// Implement "eat" function that throws error if ate token is not expected.
 
 
 pub struct Parser {
@@ -42,6 +44,19 @@ impl Parser {
         lit
     }
 
+    // Not tested
+    fn parse_let_exp(&mut self) -> Result<Exp, ErrorType> {
+        self.tokens.next(); // consume "LET" token
+        let id = match self.tokens.next().unwrap() {
+            Token::Identifier(x) => x,
+            _ => panic!("Token after LET was not an identifier")
+        };
+        self.tokens.next(); //eat "=" token
+        let val = self.parse_exp().unwrap(); // Works with base_exp - something is wrong in the general case...
+        println!("Let Exp is parsed as: {}", val);
+        Ok(Exp::LetExp(id, Box::new(val)))
+    }
+
     // ##### TESTING STUFF #####
     fn parse_exp(&mut self) -> Result<Exp, ErrorType> {
         let left = self.parse_base_exp()?;
@@ -51,7 +66,12 @@ impl Parser {
     // Base exps is a non-binop expression
     fn parse_base_exp(&mut self) -> Result<Exp, ErrorType> {
         let base = match self.tokens.peek() {
-            Some(Token::IntLit(_)) => self.parse_int_lit(), // int lit already eats
+            Some(Token::IntLit(_)) => {
+                self.parse_int_lit()
+            }, // int lit already eats
+            Some(Token::LET) => {
+                self.parse_let_exp()
+            },
             _ => Err("Error"),
         };
         base
@@ -66,12 +86,19 @@ impl Parser {
         mut left: Exp,
         min_precedence: i32,
     ) -> Result<Exp, ErrorType> {
+
+        // If no token is present, return left. Is some is present, proceed
+        match self.tokens.peek() {
+            Some(t) => (),
+            None => return Ok(left)
+        };
+
         let mut lookahead = self.tokens.next().unwrap();
+        let pred = bin_op_precedence(&lookahead);
         while(bin_op_precedence(&lookahead) >= min_precedence) {
+            println!("Entered loop");
             let op = lookahead;
             let mut right = self.parse_base_exp()?;
-            
-            //self.tokens.next(); //eat
 
             lookahead = self.tokens.next().unwrap();
             while(bin_op_precedence(&lookahead) > bin_op_precedence(&op)) {
@@ -82,6 +109,9 @@ impl Parser {
         }
         Ok(left)
     }
+
+
+
 
     // ##### TESTING STUFF #####
 
