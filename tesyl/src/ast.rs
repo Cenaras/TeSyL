@@ -5,11 +5,14 @@ use std::fmt::{self};
 use crate::tokens::Token;
 type id = String;
 
+// Do we require ; after all exps? Or just for seqexps?
+
 pub enum Exp {
     BinOpExp(Box<Exp>, BinOp, Box<Exp>),
     IntExp(u32),
     VarExp(id),
     LetExp(id, Box<Exp>),
+    SeqExp(Box<Exp>, Box<Exp>),
     Undefined,
 }
 
@@ -39,6 +42,7 @@ impl fmt::Display for Exp {
             Exp::IntExp(v) => write!(f, "IntExp({})", v),
             Exp::VarExp(var) => write!(f, "VarExp({})", var),
             Exp::LetExp(x, v) => write!(f, "LetExp({}, {})", x, v),
+            Exp::SeqExp(e1, e2) => write!(f, "SeqExp({}, {})", e1, e2),
             Exp::Undefined => write!(f, "Undefined"),
             _ => write!(f, "Not Implemented "),
         }

@@ -15,9 +15,12 @@ The grammar of TeSyL follows an functional style where everything is an expressi
 
 Program := Exp
 
-Exp := Int; | Exp OP Exp; | Let Exp = Exp; | If Exp then Exp else Exp; | Exp ; Exp | 
+Exp := Int | Exp BinOp Exp | UnOp Exp | Let Exp = Exp | If Exp then Exp else Exp | Exp ; Exp |  
 Int := 1 | 2 | 3 | ...  
-OP := + | - | * | / | > | < | =
+BinOp := + | - | * | / | > | < | =  
+UnOp := - 
+
+
 
 *The grammar will be displayed here, once it is ready. The grammar is a work in progress.*
 
@@ -26,6 +29,7 @@ OP := + | - | * | / | > | < | =
  * Implement minimal lexer
  * Implement minimal parser
  * Implement minimal interpreter
+ * Design terrible syntax 
  * Expand Lexer, Parser, Interpreter
  * Optimization/Benchmarking work
     * Ownership / Borrowing of values
