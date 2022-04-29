@@ -56,8 +56,38 @@ impl Parser {
         return match self.tokens.peek().unwrap() {
             Token::IntLit(v) => self.int_lit(),
             Token::LET => self.let_expr(),
+            Token::Identifier(id) => self.var_expr(), // Probably also add call exp to this one later...
+            Token::OpenParen => self.seq_expr(),
             _ => Err("Test"),
         };
+    }
+
+    fn var_expr(&mut self) -> Result<Exp, ErrorType> {
+        let id = self.identifier();
+        let id_temp = id.clone();
+        self.eat(&Token::Identifier(id_temp));
+        Ok(Exp::VarExp(id))
+    }
+
+    fn seq_expr(&mut self) -> Result<Exp, ErrorType> {
+        self.eat(&Token::OpenParen);
+
+        let mut expressions = vec![self.expr()?];
+
+        // "While self.tokens.peek destructs into SEMICOLON, do the following..."
+        while let Token::SEMICOLON = self.tokens.peek().unwrap() {
+            self.eat(&Token::SEMICOLON);
+            println!("Ate!\n");
+            println!("Next token is: {}", self.tokens.peek().unwrap());
+            let test = self.expr()?;
+            println!("Current contents: {:?}", expressions);
+            expressions.push(test);
+
+        }
+
+        self.eat(&Token::CloseParen);
+        Ok(Exp::SeqExp(expressions))
+
     }
 
     fn let_expr(&mut self) -> Result<Exp, ErrorType> {

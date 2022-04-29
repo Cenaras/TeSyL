@@ -15,6 +15,8 @@ pub enum Token {
     IF,
     THEN,
     ELSE,
+    OpenParen,
+    CloseParen,
     INVALID,
 }
 
@@ -55,6 +57,8 @@ impl fmt::Display for Token {
             Token::IF => write!(f, "[IF] "),
             Token::THEN => write!(f, "[THEN] "),
             Token::ELSE => write!(f, "[ELSE] "),
+            Token::OpenParen => write!(f, "( "),
+            Token::CloseParen => write!(f, ") "),
             Token::INVALID => write!(f, "[INVALID] "),
             _ => write!(f, "Not Implemented "),
         }

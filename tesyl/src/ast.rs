@@ -6,16 +6,17 @@ use std::fmt::{self};
 type id = String;
 
 // Do we require ; after all exps? Or just for seqexps?
-
+#[derive(Debug)]
 pub enum Exp {
     BinOpExp(Box<Exp>, BinOp, Box<Exp>),
     IntExp(u32),
     VarExp(id),
     LetExp(id, Box<Exp>),
-    SeqExp(Box<Exp>, Box<Exp>),
+    SeqExp(Vec<Exp>),
     Undefined,
 }
 
+#[derive(Debug)]
 pub enum BinOp {
     PlusBinOp,
     MinusBinOp,
@@ -41,7 +42,7 @@ impl fmt::Display for Exp {
             Exp::IntExp(v) => write!(f, "IntExp({})", v),
             Exp::VarExp(var) => write!(f, "VarExp({})", var),
             Exp::LetExp(x, v) => write!(f, "LetExp({}, {})", x, v),
-            Exp::SeqExp(e1, e2) => write!(f, "SeqExp({}, {})", e1, e2),
+            Exp::SeqExp(l) => write!(f, "SeqExp({:?})", l),
             Exp::Undefined => write!(f, "Undefined"),
             _ => write!(f, "Not Implemented "),
         }

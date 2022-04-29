@@ -78,6 +78,8 @@ fn get_token(iter: &mut Peekable<Chars>) -> Token {
                 '>' => Token::GE,
                 '<' => Token::LE,
                 '=' => Token::EQUAL,
+                '(' => Token::OpenParen,
+                ')' => Token::CloseParen,
                 _ => Token::INVALID,
             };
         }
