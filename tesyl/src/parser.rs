@@ -30,6 +30,13 @@ impl Parser {
 
     pub fn parse_program(&mut self) -> Result<Exp, ErrorType> {
         let result =  self.parse_exp()?;
+        println!("Result: {}\n", result);
+        match self.tokens.peek() {
+            Some(t) => println!("Next token is {}", t),
+            None => println!("No more tokens!")
+        };
+
+
         Ok(result)
     }
 
@@ -52,14 +59,18 @@ impl Parser {
             _ => panic!("Token after LET was not an identifier")
         };
         self.tokens.next(); //eat "=" token
-        let val = self.parse_exp().unwrap(); // Works with base_exp - something is wrong in the general case...
+        let val = self.parse_exp().unwrap();
         println!("Let Exp is parsed as: {}", val);
+        //println!("Next after LetExp parsed is {}", self.tokens.peek().unwrap());
         Ok(Exp::LetExp(id, Box::new(val)))
     }
 
     // ##### TESTING STUFF #####
     fn parse_exp(&mut self) -> Result<Exp, ErrorType> {
         let left = self.parse_base_exp()?;
+        println!("Base is {}", left);
+
+
         self.parse_exp_left_to_right(left, 0)
     }
 
@@ -81,6 +92,13 @@ impl Parser {
     // Break out = just return left exp
 
 
+
+    // ERROR IN LOGIC HERE - Right now next token should be ; but it says PLUS...
+    // Maybe the ; gets eaten here by mistake...
+    // Even with ; in let.tsl, next is EOF...
+
+
+    //TODO: Restructure this, to possibly only parse binops...
     fn parse_exp_left_to_right(
         &mut self,
         mut left: Exp,
@@ -89,7 +107,10 @@ impl Parser {
 
         // If no token is present, return left. Is some is present, proceed
         match self.tokens.peek() {
-            Some(t) => (),
+            Some(t) => {
+                println!("From LTR: {}\n", self.tokens.peek().unwrap());
+                ()
+            },
             None => return Ok(left)
         };
 

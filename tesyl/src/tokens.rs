@@ -47,6 +47,7 @@ impl fmt::Display for Token {
             Token::GE => write!(f, "[GE] "),
             Token::LE => write!(f, "[LE] "),
             Token::EQUAL => write!(f, "[EQUAL] "),
+            Token::SEMICOLON => write!(f, "[SEMICOLON] "),
             Token::IntLit(val) => write!(f, "[IntLit({})] ", val),
             Token::Identifier(name) => write!(f, "[IDENTIFIER({})] ", name),
             Token::EOF => write!(f, "[EOF] "),
