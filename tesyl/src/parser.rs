@@ -82,12 +82,10 @@ impl Parser {
             let test = self.expr()?;
             println!("Current contents: {:?}", expressions);
             expressions.push(test);
-
         }
 
         self.eat(&Token::CloseParen);
         Ok(Exp::SeqExp(expressions))
-
     }
 
     fn let_expr(&mut self) -> Result<Exp, ErrorType> {

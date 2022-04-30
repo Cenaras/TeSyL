@@ -6,7 +6,7 @@ use std::fmt::{self};
 type id = String;
 
 // Do we require ; after all exps? Or just for seqexps?
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Exp {
     BinOpExp(Box<Exp>, BinOp, Box<Exp>),
     IntExp(u32),
@@ -16,7 +16,7 @@ pub enum Exp {
     Undefined,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum BinOp {
     PlusBinOp,
     MinusBinOp,
@@ -35,10 +35,11 @@ pub fn bin_op_exp_from_token(token: &Token) -> BinOp {
     }
 }
 
+// Potentially fix SeqExp to write more like we expect.
 impl fmt::Display for Exp {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match &*self {
-            Exp::BinOpExp(left, op, right) => write!(f, "BinOpExp({} {} {}) ", left, op, right),
+            Exp::BinOpExp(left, op, right) => write!(f, "BinOpExp({} {} {})", left, op, right),
             Exp::IntExp(v) => write!(f, "IntExp({})", v),
             Exp::VarExp(var) => write!(f, "VarExp({})", var),
             Exp::LetExp(x, v) => write!(f, "LetExp({}, {})", x, v),
