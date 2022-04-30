@@ -20,22 +20,13 @@ pub enum Token {
     INVALID,
 }
 
-/*
-        precedence = new HashMap<>();
-        precedence.put(TokenType.PLUS, 1);
-        precedence.put(TokenType.MINUS, 1);
-        precedence.put(TokenType.TIMES, 2);
-        precedence.put(TokenType.DIVIDE, 2);
-
-*/
-
-pub fn bin_op_precedence(op: &Token) -> i32 {
+/*pub fn bin_op_precedence(op: &Token) -> i32 {
     match op {
         Token::PLUS | Token::MINUS => 10,
         Token::TIMES | Token::DIVIDE => 20,
         _ => -1,
     }
-}
+}*/
 
 use std::fmt::{self};
 
@@ -59,7 +50,6 @@ impl fmt::Display for Token {
             Token::ELSE => write!(f, "[ELSE] "),
             Token::OpenParen => write!(f, "( "),
             Token::CloseParen => write!(f, ") "),
-            Token::INVALID => write!(f, "[INVALID] "),
             _ => write!(f, "Not Implemented "),
         }
     }

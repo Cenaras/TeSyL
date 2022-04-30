@@ -4,7 +4,6 @@ mod tokens;
 mod val;
 
 use core::panic;
-use std::io::BufRead;
 
 // Using the module tokens
 use tokens::Token; // Shorthanding tokens::TOKENS to just TOKENS

@@ -1,6 +1,5 @@
 use core::panic;
 use std::collections::HashMap;
-use std::iter::Map;
 
 use crate::ast::BinOp;
 use crate::print_program;
@@ -18,7 +17,7 @@ pub struct Interpreter {
 
 impl Interpreter {
     pub fn new() -> Interpreter {
-        let mut map: HashMap<Id, Val> = HashMap::new();
+        let map: HashMap<Id, Val> = HashMap::new();
         Interpreter { env: map }
     }
 
@@ -61,9 +60,6 @@ impl Interpreter {
                             panic!("Error divide")
                         }
                     },
-                    _ => {
-                        panic!("Undefined, remove me when done")
-                    }
                 }
             }
             // Update environment. LetExp returns Unit
@@ -84,8 +80,6 @@ impl Interpreter {
                 }
                 return result;
             }
-
-            _ => Val::Undefined,
         };
     }
 }

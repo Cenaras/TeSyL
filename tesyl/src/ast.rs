@@ -1,7 +1,6 @@
 // Data in structs/enums is stored inline inside memory. Since recursive type, we cannot allocate
 // size on stack, since recursion gives infinite size. Therefore wrap in Box which then stores on heap.
 // Box<T> is a pointer (fixed size) to the heap, where we can have dynamic size.
-use crate::tokens::Token;
 use std::fmt::{self};
 type Id = String;
 
@@ -13,7 +12,7 @@ pub enum Exp {
     VarExp(Id),
     LetExp(Id, Box<Exp>),
     SeqExp(Vec<Exp>),
-    Undefined,
+    //Undefined,
 }
 
 #[derive(Debug, Clone)]
@@ -22,10 +21,9 @@ pub enum BinOp {
     MinusBinOp,
     TimesBinOp,
     DivideBinOp,
-    Undefined,
 }
 
-pub fn bin_op_exp_from_token(token: &Token) -> BinOp {
+/*pub fn bin_op_exp_from_token(token: &Token) -> BinOp {
     match token {
         Token::PLUS => BinOp::PlusBinOp,
         Token::MINUS => BinOp::MinusBinOp,
@@ -33,7 +31,7 @@ pub fn bin_op_exp_from_token(token: &Token) -> BinOp {
         Token::DIVIDE => BinOp::DivideBinOp,
         _ => BinOp::Undefined,
     }
-}
+}*/
 
 // Potentially fix SeqExp to write more like we expect.
 impl fmt::Display for Exp {
@@ -44,8 +42,8 @@ impl fmt::Display for Exp {
             Exp::VarExp(var) => write!(f, "VarExp({})", var),
             Exp::LetExp(x, v) => write!(f, "LetExp({}, {})", x, v),
             Exp::SeqExp(l) => write!(f, "SeqExp({:?})", l),
-            Exp::Undefined => write!(f, "Undefined"),
-            _ => write!(f, "Not Implemented "),
+            //Exp::Undefined => write!(f, "Undefined"),
+            //_ => write!(f, "Not Implemented "),
         }
     }
 }
@@ -57,7 +55,6 @@ impl fmt::Display for BinOp {
             BinOp::MinusBinOp => write!(f, "-"),
             BinOp::TimesBinOp => write!(f, "*"),
             BinOp::DivideBinOp => write!(f, "/"),
-            _ => write!(f, "undefined "),
         }
     }
 }
