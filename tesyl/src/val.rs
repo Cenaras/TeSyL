@@ -3,7 +3,7 @@
 pub enum Val {
     IntVal(i32),
     UnitVal,
-    //BoolVal(bool),
+    BoolVal(bool),
     Undefined,
 }
 
@@ -13,6 +13,7 @@ impl fmt::Display for Val {
         match &*self {
             Val::IntVal(v) => write!(f, "{}", v),
             Val::UnitVal => write!(f, "()"),
+            Val::BoolVal(b) => write!(f, "{}", b),
             _ => write!(f, "Value not implemented "),
         }
     }

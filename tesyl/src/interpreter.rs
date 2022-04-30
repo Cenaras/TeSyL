@@ -27,6 +27,7 @@ impl Interpreter {
 
         return match e {
             Exp::IntExp(v) => Val::IntVal(v),
+            Exp::BoolExp(b) => Val::BoolVal(b),
             Exp::BinOpExp(left, op, right) => {
                 let left = self.eval(*left);
                 let right = self.eval(*right);
