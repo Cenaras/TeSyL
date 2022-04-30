@@ -1,0 +1,1 @@
+[LET][Identifier(x)][EQUAL][TRUE][EOF]

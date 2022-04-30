@@ -8,7 +8,8 @@ type Id = String;
 #[derive(Debug, Clone)]
 pub enum Exp {
     BinOpExp(Box<Exp>, BinOp, Box<Exp>),
-    IntExp(u32),
+    IntExp(i32),
+    BoolExp(bool),
     VarExp(Id),
     LetExp(Id, Box<Exp>),
     SeqExp(Vec<Exp>),
@@ -39,9 +40,11 @@ impl fmt::Display for Exp {
         match &*self {
             Exp::BinOpExp(left, op, right) => write!(f, "BinOpExp({} {} {})", left, op, right),
             Exp::IntExp(v) => write!(f, "IntExp({})", v),
+            Exp::BoolExp(b) => write!(f, "BoolExp({})", b),
             Exp::VarExp(var) => write!(f, "VarExp({})", var),
             Exp::LetExp(x, v) => write!(f, "LetExp({}, {})", x, v),
             Exp::SeqExp(l) => write!(f, "SeqExp({:?})", l),
+            
             //Exp::Undefined => write!(f, "Undefined"),
             //_ => write!(f, "Not Implemented "),
         }
