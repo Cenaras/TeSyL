@@ -2,6 +2,7 @@
 #[derive(PartialEq)]
 pub enum Val {
     IntVal(u32),
+    UnitVal,
     //BoolVal(bool),
     Undefined,
 }
@@ -11,8 +12,8 @@ impl fmt::Display for Val {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match &*self {
             Val::IntVal(v) => write!(f, "{}", v),
-            _ => write!(f, "Not Implemented "),
+            Val::UnitVal => write!(f, "()"),
+            _ => write!(f, "Value not implemented "),
         }
     }
 }
-

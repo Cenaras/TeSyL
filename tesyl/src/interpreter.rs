@@ -50,23 +50,39 @@ impl Interpreter {
                             panic!("Error times")
                         }
                     },
-                    BinOp::DivideBinOp => {
-                        match (left, right) {
-                            (Val::IntVal(v1), Val::IntVal(v2)) => {
-                                /*if (right == Val::IntVal(0)) {
-                                    panic!("Division by 0 error")
-                                }*/
-                                Val::IntVal(v1 / v2)
+                    BinOp::DivideBinOp => match (left, right) {
+                        (Val::IntVal(v1), Val::IntVal(v2)) => {
+                            if (v2 == 0) {
+                                panic!("Division by 0 error")
                             }
-                            _ => {
-                                panic!("Error divide")
-                            }
+                            Val::IntVal(v1 / v2)
                         }
-                    }
+                        _ => {
+                            panic!("Error divide")
+                        }
+                    },
                     _ => {
                         panic!("Undefined, remove me when done")
                     }
                 }
+            }
+            // Update environment. LetExp returns Unit
+            Exp::LetExp(id, exp) => {
+                let val = self.eval(*exp);
+                self.env.insert(id, val);
+                Val::UnitVal
+            }
+            Exp::VarExp(id) => {
+                // Copy map, remove entry to gain ownership.
+                let temp_map = &mut self.env; //Maybe find better way than map copy
+                temp_map.remove(&id).unwrap()
+            }
+            Exp::SeqExp(expressions) => {
+                let mut result = Val::UnitVal; // If empty, return unit
+                for expr in expressions {
+                    result = self.eval(expr); // eval each expression, possibly updating the environment. Potential optimizer to only safe last...
+                }
+                return result;
             }
 
             _ => Val::Undefined,
