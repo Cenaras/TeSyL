@@ -47,7 +47,7 @@ which will invoke the main.rs file, and execute the lexing, parsing and eventual
 ```
 cargo run [FILENAME].tsl --test/-t -[MODE]
 ```
-where *[MODE]* is either *-lex* og *-par*, for the respective test.  
+where *[MODE]* is either *lex* og *par*, for the respective test.  
 **EXAMPLE**: 
 ```
 cargo run arith.tsl -lex 
