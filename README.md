@@ -38,19 +38,20 @@ UnOp := -
         * Eval of zero-child, ...
 
 ## Running & Testing
-The project supports testing of provided sample files. Simply put the program in the /samples directory and name it *[FILENAME]*.tsl. Then put the expected lexing/parsing file in the respective directly, and call them *[FILENAME]*.lex or .par respectively.   
+The project supports testing of provided sample files. Simply put the program in the /samples directory and name it *[FILENAME]*.tsl. Then put the expected lexing/parsing/runtime file in the respective directly, and call them *[FILENAME]*.lex, .par or .int (for runtime)respectively.   
 Run the interpreter with:
 ```
 cargo run [FILENAME].tsl
 ```
-which will invoke the main.rs file, and execute the lexing, parsing and eventually the interpretation of the program. For testing, run the command
+which will invoke the main.rs file, and execute the lexing, parsing and interpretation of the program. For testing, run the command
 ```
 cargo run [FILENAME].tsl --test/-t -[MODE]
 ```
-where *[MODE]* is either *lex* og *par*, for the respective test.  
+where *[MODE]* is either *lex*, *par* or *int*, for the respective test.  
 **EXAMPLE**: 
 ```
-cargo run arith.tsl -lex 
-cargo run arith.tsl -par
+cargo run arith.tsl --test -lex 
+cargo run arith.tsl --test -par
+cargo run arith.tsl --test -int
 ```
-will first run the lexing, and compare the result with the file in */expected/lexing/arith.lex* and then likewise for parsing with */expected/parsing/arith.par*
+will first run the lexing, and compare the result with the file in */expected/lexing/arith.lex* and then likewise for parsing with */expected/parsing/arith.par* and finally for interpretation with */expected/runtime/arith.int*
