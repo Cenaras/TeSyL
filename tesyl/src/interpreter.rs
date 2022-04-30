@@ -77,7 +77,7 @@ impl Interpreter {
             Exp::SeqExp(expressions) => {
                 let mut result = Val::UnitVal; // If empty, return unit
                 for expr in expressions {
-                    result = self.eval(expr); // eval each expression, possibly updating the environment. Potential optimizer to only safe last...
+                    result = self.eval(expr); // eval each expression, possibly updating the environment. Potential optimizer to only save last...
                 }
                 return result;
             }

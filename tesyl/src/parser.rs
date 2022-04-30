@@ -55,15 +55,23 @@ impl Parser {
             Token::Identifier(id) => self.var_expr(), // Probably also add call exp to this one later...
             Token::OpenParen => self.seq_expr(),
             Token::TRUE | Token::FALSE => self.bool_exp(),
+            //Token::IF => self.if_expr(),
             _ => Err("Test"),
         };
     }
 
+    /*
+    fn if_expr(&mut self) {
+        self.eat(&Token::IF);
+        
+    }
+     */
+
     // Not tested - maybe not in primary exp?
     fn bool_exp(&mut self) -> Result<Exp, ErrorType> {
         let val = match self.tokens.peek().unwrap() {
-            Token::TRUE => true,
-            Token::FALSE => false,
+            Token::TRUE => {self.eat(&Token::TRUE); true},
+            Token::FALSE => {self.eat(&Token::TRUE); false},
             _ => panic!("Could not parse boolean expression"),
         };
         Ok(Exp::BoolExp(val))
