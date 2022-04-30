@@ -38,7 +38,7 @@ UnOp := -
         * Eval of zero-child, ...
 
 ## Running & Testing
-The project supports testing of provided sample files. Simply put the program in the /samples directory and name it *[FILENAME]*.tsl. Then put the expected lexing/parsing/runtime file in the respective directly, and call them *[FILENAME]*.lex, .par or .int (for runtime)respectively.   
+The project supports testing of provided sample files. Simply put the program in the /samples directory and name it *[FILENAME]*.tsl. Then put the expected lexing/parsing/runtime file in the respective directly, and call them *[FILENAME]*.lex, .par or .int (for runtime) respectively.   
 Run the interpreter with:
 ```
 cargo run [FILENAME].tsl

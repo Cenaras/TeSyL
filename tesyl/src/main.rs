@@ -3,6 +3,8 @@
 mod tokens;
 mod val;
 
+use core::panic;
+
 // Using the module tokens
 use tokens::Token; // Shorthanding tokens::TOKENS to just TOKENS
 
@@ -61,20 +63,14 @@ fn main() {
             "-lex" => test_lex(test_filename, tokens, run_all),
             "-par" => test_par(test_filename, test_program, run_all),
             "-int" => test_int(test_filename, result, run_all),
-            _ => panic!("Test type not supported; only -lex and -par are supported"),
+            _ => panic!("Test type not supported; only -lex, -par and -int are supported"),
         };
     }
 }
 
-// ToDo: Support run_all files in directory
+// ToDo: Support run_all files in directory + clean up and reduce code duplication
 fn test_lex(filename: String, tokens: Vec<Token>, run_all: bool) {
-    let mut test_name = filename.strip_suffix(".tsl").unwrap().to_owned();
-    test_name.push_str(".lex");
-
-    // Read file, split on spaces, compare. Get tokens and push to big string...
-    let mut expected =
-        std::fs::read_to_string(format!(".\\expected\\lexing\\{}", test_name)).unwrap();
-    expected.retain(|c| !c.is_whitespace()); // remove whitespace
+    let (expected, test_name) = generate_expected(".lex".to_string(), filename);
 
     let mut result = String::from("");
     for token in tokens {
@@ -88,12 +84,7 @@ fn test_lex(filename: String, tokens: Vec<Token>, run_all: bool) {
 }
 
 fn test_par(filename: String, program: Result<Exp, &str>, run_all: bool) {
-    let mut test_name = filename.strip_suffix(".tsl").unwrap().to_owned();
-    test_name.push_str(".par");
-
-    let mut expected =
-        std::fs::read_to_string(format!(".\\expected\\parsing\\{}", test_name)).unwrap();
-    expected.retain(|c| !c.is_whitespace()); // remove whitespace
+    let (expected, test_name) = generate_expected(".par".to_string(), filename);
 
     let mut result = format!("{}", program.unwrap());
     result.retain(|c| !c.is_whitespace()); // remove whitespace
@@ -103,19 +94,31 @@ fn test_par(filename: String, program: Result<Exp, &str>, run_all: bool) {
 }
 
 use crate::val::Val;
-fn test_int(filename: String, value: Val, run_all: bool) {
-    let mut test_name = filename.strip_suffix(".tsl").unwrap().to_owned();
-    test_name.push_str(".int");
 
-    let mut expected =
-        std::fs::read_to_string(format!(".\\expected\\runtime\\{}", test_name)).unwrap();
-    expected.retain(|c| !c.is_whitespace()); // remove whitespace
+fn test_int(filename: String, value: Val, run_all: bool) {
+    let (expected, test_name) = generate_expected(".int".to_string(), filename);
 
     let mut result = format!("{}", value);
     result.retain(|c| !c.is_whitespace()); // remove whitespace
 
     assert!(expected.eq(&result));
     println!("Interpreter test successful for {}", test_name); 
+}
+
+fn generate_expected(test_type: String, filename: String) -> (String, String) {
+    let mut test_name = filename.strip_suffix(".tsl").unwrap().to_owned();
+    test_name.push_str(test_type.as_str());
+
+    let path = match test_type.as_str() {
+        ".lex" => format!(".\\expected\\lexing\\{}", test_name),
+        ".par" => format!(".\\expected\\parsing\\{}", test_name),
+        ".int" => format!(".\\expected\\runtime\\{}", test_name),
+        _ => panic!("Unexpected test type {}", test_type)
+    };
+
+    let mut expected = std::fs::read_to_string(format!("{}", path)).unwrap();
+    expected.retain(|c| !c.is_whitespace());
+    (expected, test_name)
 }
 
 pub fn print_tokens(tokens: &Vec<Token>) {
