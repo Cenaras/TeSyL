@@ -1,0 +1,1 @@
+( [LET] [Identifier(x)] [EQUAL] [IntLit(2)] [SEMICOLON] [Identifier(x)] [PLUS] [IntLit(2)]) [EOF]

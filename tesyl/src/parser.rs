@@ -1,18 +1,25 @@
 use crate::ast::bin_op_exp_from_token;
 use crate::tokens::bin_op_precedence;
+use std::result;
+
 use crate::{ast::BinOp, Exp};
 use core::panic;
+use std::iter::Peekable;
 use std::vec::IntoIter;
-use std::{iter::Peekable};
 //TODO: Add sequence to grammar?
 use crate::{print_tokens, Token};
 
 type TokenIter = Peekable<IntoIter<Token>>;
 type ErrorType = &'static str;
-//TODO: Probably result types instead - also nice way of parsing.
-// Also: Eat tokens when they're peeked, in functions
-// Implement "eat" function that throws error if ate token is not expected.
 
+/*
+    Right now, additive is top level
+    It can call mult, which can call primary, i.e. let and int_lit
+
+*/
+
+// Useful reference implementation might be:
+// https://github.com/antoyo/tiger-rs/blob/master/tiger/src/parser.rs
 
 pub struct Parser {
     tokens: TokenIter,
@@ -28,158 +35,143 @@ impl Parser {
         }
     }
 
+    fn eat(&mut self, expected: &Token) {
+        if expected == self.tokens.peek().expect("No token present to eat") {
+            self.tokens.next();
+            //println!("Ate");
+        }
+    }
+
     pub fn parse_program(&mut self) -> Result<Exp, ErrorType> {
-        let result =  self.parse_exp()?;
-        println!("Result: {}\n", result);
-        match self.tokens.peek() {
-            Some(t) => println!("Next token is {}", t),
-            None => println!("No more tokens!")
+        return self.expr();
+    }
+
+    // Placeholder for now.
+    fn expr(&mut self) -> Result<Exp, ErrorType> {
+        return self.additive_expr();
+        //return self.primary_expr();
+    }
+
+    fn primary_expr(&mut self) -> Result<Exp, ErrorType> {
+        return match self.tokens.peek().unwrap() {
+            Token::IntLit(v) => self.int_lit(),
+            Token::LET => self.let_expr(),
+            Token::Identifier(id) => self.var_expr(), // Probably also add call exp to this one later...
+            Token::OpenParen => self.seq_expr(),
+            _ => Err("Test"),
         };
-
-
-        Ok(result)
     }
 
-    fn parse_int_lit(&mut self) -> Result<Exp, ErrorType> {
-        let lit = match self.tokens.peek().unwrap() {
-            Token::IntLit(v) => {
-                Ok(Exp::IntExp(v.clone()))
-            },
-            _ => Err("Unable to parse expression"),
+    fn var_expr(&mut self) -> Result<Exp, ErrorType> {
+        let id = self.identifier();
+        let id_temp = id.clone();
+        self.eat(&Token::Identifier(id_temp));
+        Ok(Exp::VarExp(id))
+    }
+
+    fn seq_expr(&mut self) -> Result<Exp, ErrorType> {
+        self.eat(&Token::OpenParen);
+
+        let mut expressions = vec![self.expr()?];
+
+        // "While self.tokens.peek destructs into SEMICOLON, do the following..."
+        while let Token::SEMICOLON = self.tokens.peek().unwrap() {
+            self.eat(&Token::SEMICOLON);
+            println!("Ate!\n");
+            println!("Next token is: {}", self.tokens.peek().unwrap());
+            let test = self.expr()?;
+            println!("Current contents: {:?}", expressions);
+            expressions.push(test);
+        }
+
+        self.eat(&Token::CloseParen);
+        Ok(Exp::SeqExp(expressions))
+    }
+
+    fn let_expr(&mut self) -> Result<Exp, ErrorType> {
+        self.eat(&Token::LET);
+
+        let id = self.identifier();
+
+        self.eat(&Token::Identifier(id.clone())); //TODO: Handle in identifier case
+        self.eat(&Token::EQUAL);
+
+        let expr = self.expr().unwrap();
+
+        Ok(Exp::LetExp(id, Box::new(expr)))
+    }
+
+    fn identifier(&mut self) -> String {
+        let next = self.tokens.peek();
+        let id = match next {
+            Some(Token::Identifier(x)) => x,
+            _ => {
+                println!("Token is {}", next.unwrap());
+                panic!("Could not parse identifier");
+            }
         };
-        self.tokens.next(); // eat
-        lit
+        id.to_string()
     }
 
-    // Not tested
-    fn parse_let_exp(&mut self) -> Result<Exp, ErrorType> {
-        self.tokens.next(); // consume "LET" token
-        let id = match self.tokens.next().unwrap() {
-            Token::Identifier(x) => x,
-            _ => panic!("Token after LET was not an identifier")
-        };
-        self.tokens.next(); //eat "=" token
-        let val = self.parse_exp().unwrap();
-        println!("Let Exp is parsed as: {}", val);
-        //println!("Next after LetExp parsed is {}", self.tokens.peek().unwrap());
-        Ok(Exp::LetExp(id, Box::new(val)))
-    }
+    fn int_lit(&mut self) -> Result<Exp, ErrorType> {
+        let next = self.tokens.peek().expect("Could not read int");
+        let mut value = 0;
 
-    // ##### TESTING STUFF #####
-    fn parse_exp(&mut self) -> Result<Exp, ErrorType> {
-        let left = self.parse_base_exp()?;
-        println!("Base is {}", left);
-
-
-        self.parse_exp_left_to_right(left, 0)
-    }
-
-    // Base exps is a non-binop expression
-    fn parse_base_exp(&mut self) -> Result<Exp, ErrorType> {
-        let base = match self.tokens.peek() {
-            Some(Token::IntLit(_)) => {
-                self.parse_int_lit()
-            }, // int lit already eats
-            Some(Token::LET) => {
-                self.parse_let_exp()
-            },
+        let intlit = match next {
+            Token::IntLit(val) => {
+                value = val.clone();
+                Ok(Exp::IntExp(val.clone()))
+            }
             _ => Err("Error"),
         };
-        base
+        self.eat(&Token::IntLit(value));
+        return intlit;
     }
 
-    // TODO: Allow base exps to be parsed such as LetExp: Break out of parse_left_to_right if the precedence if below current?
-    // Break out = just return left exp
+    fn additive_expr(&mut self) -> Result<Exp, ErrorType> {
+        let mut left = self.multiplicative_expr()?;
 
+        loop {
+            let op = match self.tokens.peek() {
+                Some(Token::PLUS) => {
+                    self.eat(&Token::PLUS);
+                    BinOp::PlusBinOp
+                }
+                Some(Token::MINUS) => {
+                    self.eat(&Token::MINUS);
+                    BinOp::MinusBinOp
+                }
+                _ => break,
+            };
 
-
-    // ERROR IN LOGIC HERE - Right now next token should be ; but it says PLUS...
-    // Maybe the ; gets eaten here by mistake...
-    // Even with ; in let.tsl, next is EOF...
-
-
-    //TODO: Restructure this, to possibly only parse binops...
-    fn parse_exp_left_to_right(
-        &mut self,
-        mut left: Exp,
-        min_precedence: i32,
-    ) -> Result<Exp, ErrorType> {
-
-        // If no token is present, return left. Is some is present, proceed
-        match self.tokens.peek() {
-            Some(t) => {
-                println!("From LTR: {}\n", self.tokens.peek().unwrap());
-                ()
-            },
-            None => return Ok(left)
-        };
-
-        let mut lookahead = self.tokens.next().unwrap();
-        let pred = bin_op_precedence(&lookahead);
-        while(bin_op_precedence(&lookahead) >= min_precedence) {
-            println!("Entered loop");
-            let op = lookahead;
-            let mut right = self.parse_base_exp()?;
-
-            lookahead = self.tokens.next().unwrap();
-            while(bin_op_precedence(&lookahead) > bin_op_precedence(&op)) {
-                right = self.parse_exp_left_to_right(right, bin_op_precedence(&op) + 1)?;
-                lookahead = self.tokens.next().unwrap();
-            }
-            left = Exp::BinOpExp(Box::new(left), bin_op_exp_from_token(&op), Box::new(right));
+            let right = self.multiplicative_expr()?;
+            left = Exp::BinOpExp(Box::new(left), op, Box::new(right))
         }
         Ok(left)
     }
 
+    // Takes primary exps or unary
 
+    // Either parse two expressions as a multiplicative expression and combine into one, or simply parse a primary expression if not multiplicative.
+    fn multiplicative_expr(&mut self) -> Result<Exp, ErrorType> {
+        let mut left = self.primary_expr()?; // unary when implemented, and let unary call primary if non unary
 
-
-    // ##### TESTING STUFF #####
-
-    /* JAVA PARSER WORK
-        //https://en.wikipedia.org/wiki/Operator-precedence_parser
-
-        private Exp parseExpLeftToRight(Exp base, int minPrecedence) throws IOException {
-            TokenType lookahead = nextToken.getType();
-            while (precedence.getOrDefault(lookahead, -1) >= minPrecedence ) {
-                TokenType op = nextToken.getType();
-                eat(op);
-                Exp right = parseBaseExp();
-                lookahead = nextToken.getType();
-                while (precedence.getOrDefault(lookahead, -1) > precedence.get(op)) { //If right associative then >= else just >: When adding ^ to language, get a "isRightAssoc()" and make a || case with >=
-                     right = parseExpLeftToRight(right, precedence.get(op) + 1);
-                     lookahead = nextToken.getType();
+        loop {
+            let op = match self.tokens.peek() {
+                Some(Token::TIMES) => {
+                    self.eat(&Token::TIMES);
+                    BinOp::TimesBinOp
                 }
-                base = new BinOpExp(base, op, right);
-            }
-            return base;
+                Some(Token::DIVIDE) => {
+                    self.eat(&Token::DIVIDE);
+                    BinOp::DivideBinOp
+                }
+                _ => break,
+            };
+
+            let right = Box::new(self.primary_expr()?);
+            left = Exp::BinOpExp(Box::new(left), op, right)
         }
-
-
-    */
+        Ok(left)
+    }
 }
-
-/*
-#[macro_export]
-macro_rules! peek_op_or_err {
-    ($self:ident) => {
-        match $self.tokens.peek() {
-            Some(Token::PLUS) => BinOp::PlusBinOp,
-            _ => return Err("Expected a symbol"),
-        }
-    };
-}
-use crate::peek_literal_or_err;
-
-#[macro_export]
-macro_rules! peek_literal_or_err {
-    ($self:ident) => {
-        match $self.tokens.peek() {
-            Some(Token::IntLit(value)) => Exp::IntExp(value.clone()),
-            _ => return Err("Expected a literal"),
-        }
-    };
-}
-
-*/
-

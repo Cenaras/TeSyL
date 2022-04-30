@@ -1,0 +1,1 @@
+[IntLit(1)] [PLUS] [IntLit(2)] [TIMES] [IntLit(3)] [PLUS] [IntLit(4)] [EOF]
