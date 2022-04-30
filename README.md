@@ -50,7 +50,7 @@ cargo run [FILENAME].tsl --test/-t -[MODE]
 where *[MODE]* is either *-lex* og *-par*, for the respective test.  
 **EXAMPLE**: 
 ```
-cargo run arith.tsl --lex 
-cargo run arith.tsl --par
+cargo run arith.tsl -lex 
+cargo run arith.tsl -par
 ```
 will first run the lexing, and compare the result with the file in */expected/lexing/arith.lex* and then likewise for parsing with */expected/parsing/arith.par*
