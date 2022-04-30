@@ -26,9 +26,9 @@ UnOp := -
 
 ### Remaining Work:
  * Construct (minimal) Grammar
- * Implement minimal lexer
- * Implement minimal parser
- * Implement minimal interpreter
+ * Implement (minimal) lexer
+ * Implement (minimal) parser
+ * Implement (minimal) interpreter
  * Design terrible syntax 
  * Expand Lexer, Parser, Interpreter
  * Optimization/Benchmarking work
@@ -36,3 +36,21 @@ UnOp := -
     * Efficient implementations
     * Interpreter optimization
         * Eval of zero-child, ...
+
+## Running & Testing
+The project supports testing of provided sample files. Simply put the program in the /samples directory and name it *[FILENAME]*.tsl. Then put the expected lexing/parsing file in the respective directly, and call them *[FILENAME]*.lex or .par respectively.   
+Run the interpreter with:
+```
+cargo run [FILENAME].tsl
+```
+which will invoke the main.rs file, and execute the lexing, parsing and eventually the interpretation of the program. For testing, run the command
+```
+cargo run [FILENAME].tsl --test/-t -[MODE]
+```
+where *[MODE]* is either *-lex* og *-par*, for the respective test.  
+**EXAMPLE**: 
+```
+cargo run arith.tsl --lex 
+cargo run arith.tsl --par
+```
+will first run the lexing, and compare the result with the file in */expected/lexing/arith.lex* and then likewise for parsing with */expected/parsing/arith.par*
