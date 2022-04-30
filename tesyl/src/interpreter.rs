@@ -80,7 +80,7 @@ impl Interpreter {
                 }
                 return result;
             }
-            _ => Val::Undefined
+            _ => Val::Undefined,
         };
     }
 }

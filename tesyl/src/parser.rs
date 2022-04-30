@@ -64,7 +64,7 @@ impl Parser {
         let val = match self.tokens.peek().unwrap() {
             Token::TRUE => true,
             Token::FALSE => false,
-            _ => panic!("Could not parse boolean expression")
+            _ => panic!("Could not parse boolean expression"),
         };
         Ok(Exp::BoolExp(val))
     }

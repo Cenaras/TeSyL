@@ -44,7 +44,6 @@ impl fmt::Display for Exp {
             Exp::VarExp(var) => write!(f, "VarExp({})", var),
             Exp::LetExp(x, v) => write!(f, "LetExp({}, {})", x, v),
             Exp::SeqExp(l) => write!(f, "SeqExp({:?})", l),
-            
             //Exp::Undefined => write!(f, "Undefined"),
             //_ => write!(f, "Not Implemented "),
         }
