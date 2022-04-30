@@ -16,7 +16,7 @@ pub struct Lexer {
 impl Lexer {
     // Init new lexer, return error if file not present
     pub fn new(program: String) -> Result<Lexer, std::io::Error> {
-        let contents = std::fs::read_to_string(program)?;
+        let contents = std::fs::read_to_string(format!(".\\samples\\{}", program))?;
         Ok(Lexer { raw: contents })
     }
 

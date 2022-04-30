@@ -51,7 +51,7 @@ impl fmt::Display for Token {
             Token::EQUAL => write!(f, "[EQUAL] "),
             Token::SEMICOLON => write!(f, "[SEMICOLON] "),
             Token::IntLit(val) => write!(f, "[IntLit({})] ", val),
-            Token::Identifier(name) => write!(f, "[IDENTIFIER({})] ", name),
+            Token::Identifier(name) => write!(f, "[Identifier({})] ", name),
             Token::EOF => write!(f, "[EOF] "),
             Token::LET => write!(f, "[LET] "),
             Token::IF => write!(f, "[IF] "),

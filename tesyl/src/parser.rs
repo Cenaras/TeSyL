@@ -153,6 +153,8 @@ impl Parser {
     }
 
     // Takes primary exps or unary
+
+    // Either parse two expressions as a multiplicative expression and combine into one, or simply parse a primary expression if not multiplicative.
     fn multiplicative_expr(&mut self) -> Result<Exp, ErrorType> {
         let mut left = self.primary_expr()?; // unary when implemented, and let unary call primary if non unary
 

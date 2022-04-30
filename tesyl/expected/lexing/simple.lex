@@ -1,0 +1,1 @@
+[IntLit(42)] [PLUS] [IntLit(87)] [EOF] 

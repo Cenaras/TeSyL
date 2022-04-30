@@ -1,0 +1,1 @@
+[LET] [Identifier(x)] [EQUAL] [IntLit(2)] [EOF] 
