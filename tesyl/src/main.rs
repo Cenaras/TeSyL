@@ -67,22 +67,21 @@ fn main() {
                 } else {
                     test_lex(test_filename, tokens, true)
                 }
-            },
+            }
             "-par" => {
                 if (run_all) {
                     test_all_parse();
                 } else {
                     test_par(test_filename, test_program, true);
                 }
-            },
+            }
             "-int" => {
                 if (run_all) {
                     test_all_int();
                 } else {
                     test_int(test_filename, result, false)
                 }
-                
-            },
+            }
             _ => panic!("Test type not supported; only -lex, -par and -int are supported"),
         };
     }
@@ -93,7 +92,10 @@ fn main() {
 fn test_all_lex() {
     let paths = std::fs::read_dir(".\\samples").unwrap();
     for path in paths {
-        let filename = format!("{}", path.unwrap().path().display()).strip_prefix(".\\samples\\").unwrap().to_string();
+        let filename = format!("{}", path.unwrap().path().display())
+            .strip_prefix(".\\samples\\")
+            .unwrap()
+            .to_string();
         let temp_file = filename.clone();
         let tokens = Lexer::new(temp_file).unwrap().lex();
         test_lex(filename, tokens, false);
@@ -105,7 +107,10 @@ fn test_all_lex() {
 fn test_all_parse() {
     let paths = std::fs::read_dir(".\\samples").unwrap();
     for path in paths {
-        let filename = format!("{}", path.unwrap().path().display()).strip_prefix(".\\samples\\").unwrap().to_string();
+        let filename = format!("{}", path.unwrap().path().display())
+            .strip_prefix(".\\samples\\")
+            .unwrap()
+            .to_string();
         let temp_file = filename.clone();
         let result = Parser::new(Lexer::new(temp_file).unwrap().lex()).parse_program();
         test_par(filename, result, false)
@@ -117,18 +122,23 @@ fn test_all_parse() {
 fn test_all_int() {
     let paths = std::fs::read_dir(".\\samples").unwrap();
     for path in paths {
-        let filename = format!("{}", path.unwrap().path().display()).strip_prefix(".\\samples\\").unwrap().to_string();
+        let filename = format!("{}", path.unwrap().path().display())
+            .strip_prefix(".\\samples\\")
+            .unwrap()
+            .to_string();
         let temp_file = filename.clone();
-        let val = Interpreter::new().eval(Parser::new(Lexer::new(temp_file).unwrap().lex()).parse_program().unwrap());
+        let val = Interpreter::new().eval(
+            Parser::new(Lexer::new(temp_file).unwrap().lex())
+                .parse_program()
+                .unwrap(),
+        );
         test_int(filename, val, false)
     }
     println!("All tests for interpreter successful!");
 }
 
-
 // ToDo: Support run_all files in directory + clean up and reduce code duplication
 fn test_lex(filename: String, tokens: Vec<Token>, do_print: bool) {
-
     let (expected, test_name) = generate_expected(".lex".to_string(), filename);
 
     let mut result = String::from("");
@@ -154,7 +164,6 @@ fn test_par(filename: String, program: Result<Exp, &str>, do_print: bool) {
     if (do_print) {
         println!("Parsing test successful for {}", test_name);
     }
-    
 }
 
 use crate::val::Val;
@@ -167,7 +176,7 @@ fn test_int(filename: String, value: Val, do_print: bool) {
 
     assert!(expected.eq(&result));
     if (do_print) {
-        println!("Interpreter test successful for {}", test_name); 
+        println!("Interpreter test successful for {}", test_name);
     }
 }
 
@@ -179,7 +188,7 @@ fn generate_expected(test_type: String, filename: String) -> (String, String) {
         ".lex" => format!(".\\expected\\lexing\\{}", test_name),
         ".par" => format!(".\\expected\\parsing\\{}", test_name),
         ".int" => format!(".\\expected\\runtime\\{}", test_name),
-        _ => panic!("Unexpected test type {}", test_type)
+        _ => panic!("Unexpected test type {}", test_type),
     };
 
     let mut expected = std::fs::read_to_string(format!("{}", path)).unwrap();
