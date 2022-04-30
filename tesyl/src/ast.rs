@@ -3,15 +3,15 @@
 // Box<T> is a pointer (fixed size) to the heap, where we can have dynamic size.
 use crate::tokens::Token;
 use std::fmt::{self};
-type id = String;
+type Id = String;
 
 // Do we require ; after all exps? Or just for seqexps?
 #[derive(Debug, Clone)]
 pub enum Exp {
     BinOpExp(Box<Exp>, BinOp, Box<Exp>),
     IntExp(u32),
-    VarExp(id),
-    LetExp(id, Box<Exp>),
+    VarExp(Id),
+    LetExp(Id, Box<Exp>),
     SeqExp(Vec<Exp>),
     Undefined,
 }

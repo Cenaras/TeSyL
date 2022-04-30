@@ -1,7 +1,3 @@
-use crate::ast::bin_op_exp_from_token;
-use crate::tokens::bin_op_precedence;
-use std::result;
-
 use crate::{ast::BinOp, Exp};
 use core::panic;
 use std::iter::Peekable;

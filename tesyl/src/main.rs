@@ -1,7 +1,7 @@
 #![allow(unused_parens)]
 #![allow(unused_variables)]
-use std::path::Path;
 mod tokens;
+mod val;
 
 // Using the module tokens
 use tokens::Token; // Shorthanding tokens::TOKENS to just TOKENS
@@ -11,8 +11,12 @@ use lexer::Lexer; // Must be possible to avoid doing this double stuff
 
 mod parser;
 use parser::Parser;
+
 mod ast;
 use ast::*;
+
+mod interpreter;
+use interpreter::Interpreter;
 
 // Path is from current terminal path. Call from root of project
 
@@ -36,7 +40,10 @@ fn main() {
     let program = parser.parse_program();
     let test_program = program.clone();
 
-    print_program(&program.unwrap());
+    let mut interpreter = Interpreter::new();
+    let result = interpreter.eval(program.unwrap());
+    println!("Program terminated with result: \n{}", result);
+
 
     // ##### TEST PROGRAMS IF SPECIFIED #####
     // ToDo: Add --all support to test every sample file.
