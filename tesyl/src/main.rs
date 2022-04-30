@@ -4,6 +4,7 @@ mod tokens;
 mod val;
 
 use core::panic;
+use std::io::BufRead;
 
 // Using the module tokens
 use tokens::Token; // Shorthanding tokens::TOKENS to just TOKENS
@@ -60,7 +61,13 @@ fn main() {
         };
 
         match test_type.as_str() {
-            "-lex" => test_lex(test_filename, tokens, run_all),
+            "-lex" => {
+                if (run_all) {
+                    test_all_lex();
+                } else {
+                    test_lex(test_filename, tokens, true)
+                }
+            },
             "-par" => test_par(test_filename, test_program, run_all),
             "-int" => test_int(test_filename, result, run_all),
             _ => panic!("Test type not supported; only -lex, -par and -int are supported"),
@@ -68,8 +75,24 @@ fn main() {
     }
 }
 
+// Todo: Clean these up.
+
+fn test_all_lex() {
+    let paths = std::fs::read_dir(".\\samples").unwrap();
+    for path in paths {
+        let filename = format!("{}", path.unwrap().path().display()).strip_prefix(".\\samples\\").unwrap().to_string();
+        let temp_file = filename.clone();
+        let tokens = Lexer::new(temp_file).unwrap().lex();
+        test_lex(filename, tokens, false);
+    }
+
+    println!("All tests for lexing successful!")
+}
+
+
 // ToDo: Support run_all files in directory + clean up and reduce code duplication
-fn test_lex(filename: String, tokens: Vec<Token>, run_all: bool) {
+fn test_lex(filename: String, tokens: Vec<Token>, do_print: bool) {
+
     let (expected, test_name) = generate_expected(".lex".to_string(), filename);
 
     let mut result = String::from("");
@@ -80,7 +103,9 @@ fn test_lex(filename: String, tokens: Vec<Token>, run_all: bool) {
 
     assert!(expected.eq(&result));
 
-    println!("Lexing test successful for {}", test_name);
+    if (do_print) {
+        println!("Lexing test successful for {}", test_name);
+    }
 }
 
 fn test_par(filename: String, program: Result<Exp, &str>, run_all: bool) {
