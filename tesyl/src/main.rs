@@ -68,14 +68,27 @@ fn main() {
                     test_lex(test_filename, tokens, true)
                 }
             },
-            "-par" => test_par(test_filename, test_program, run_all),
-            "-int" => test_int(test_filename, result, run_all),
+            "-par" => {
+                if (run_all) {
+                    test_all_parse();
+                } else {
+                    test_par(test_filename, test_program, true);
+                }
+            },
+            "-int" => {
+                if (run_all) {
+                    test_all_int();
+                } else {
+                    test_int(test_filename, result, false)
+                }
+                
+            },
             _ => panic!("Test type not supported; only -lex, -par and -int are supported"),
         };
     }
 }
 
-// Todo: Clean these up.
+// Todo: Clean these up. Also fix so --all is enough and we dont need to specify a file
 
 fn test_all_lex() {
     let paths = std::fs::read_dir(".\\samples").unwrap();
@@ -87,6 +100,29 @@ fn test_all_lex() {
     }
 
     println!("All tests for lexing successful!")
+}
+
+fn test_all_parse() {
+    let paths = std::fs::read_dir(".\\samples").unwrap();
+    for path in paths {
+        let filename = format!("{}", path.unwrap().path().display()).strip_prefix(".\\samples\\").unwrap().to_string();
+        let temp_file = filename.clone();
+        let result = Parser::new(Lexer::new(temp_file).unwrap().lex()).parse_program();
+        test_par(filename, result, false)
+    }
+
+    println!("All tests for parsing successful!");
+}
+
+fn test_all_int() {
+    let paths = std::fs::read_dir(".\\samples").unwrap();
+    for path in paths {
+        let filename = format!("{}", path.unwrap().path().display()).strip_prefix(".\\samples\\").unwrap().to_string();
+        let temp_file = filename.clone();
+        let val = Interpreter::new().eval(Parser::new(Lexer::new(temp_file).unwrap().lex()).parse_program().unwrap());
+        test_int(filename, val, false)
+    }
+    println!("All tests for interpreter successful!");
 }
 
 
@@ -108,26 +144,31 @@ fn test_lex(filename: String, tokens: Vec<Token>, do_print: bool) {
     }
 }
 
-fn test_par(filename: String, program: Result<Exp, &str>, run_all: bool) {
+fn test_par(filename: String, program: Result<Exp, &str>, do_print: bool) {
     let (expected, test_name) = generate_expected(".par".to_string(), filename);
 
     let mut result = format!("{}", program.unwrap());
     result.retain(|c| !c.is_whitespace()); // remove whitespace
 
     assert!(expected.eq(&result));
-    println!("Parsing test successful for {}", test_name);
+    if (do_print) {
+        println!("Parsing test successful for {}", test_name);
+    }
+    
 }
 
 use crate::val::Val;
 
-fn test_int(filename: String, value: Val, run_all: bool) {
+fn test_int(filename: String, value: Val, do_print: bool) {
     let (expected, test_name) = generate_expected(".int".to_string(), filename);
 
     let mut result = format!("{}", value);
     result.retain(|c| !c.is_whitespace()); // remove whitespace
 
     assert!(expected.eq(&result));
-    println!("Interpreter test successful for {}", test_name); 
+    if (do_print) {
+        println!("Interpreter test successful for {}", test_name); 
+    }
 }
 
 fn generate_expected(test_type: String, filename: String) -> (String, String) {
