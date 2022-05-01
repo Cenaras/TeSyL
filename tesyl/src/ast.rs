@@ -13,7 +13,7 @@ pub enum Exp {
     VarExp(Id),
     LetExp(Id, Box<Exp>),
     SeqExp(Vec<Exp>),
-    IfExp(bool, Box<Exp>, Box<Exp>),
+    IfExp(Box<Exp>, Box<Exp>, Box<Exp>),
     //Undefined,
 }
 
@@ -45,7 +45,7 @@ impl fmt::Display for Exp {
             Exp::VarExp(var) => write!(f, "VarExp({})", var),
             Exp::LetExp(x, v) => write!(f, "LetExp({}, {})", x, v),
             Exp::SeqExp(l) => write!(f, "SeqExp({:?})", l),
-            Exp::IfExp(guard, then, els) => write!(f, "IfExp({} {} {})", guard, then, els),
+            Exp::IfExp(guard, then, els) => write!(f, "IfExp({}, {}, {})", guard, then, els),
             //Exp::Undefined => write!(f, "Undefined"),
             //_ => write!(f, "Not Implemented "),
         }

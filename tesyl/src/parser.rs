@@ -55,17 +55,24 @@ impl Parser {
             Token::Identifier(id) => self.var_expr(), // Probably also add call exp to this one later...
             Token::OpenParen => self.seq_expr(),
             Token::TRUE | Token::FALSE => self.bool_exp(),
-            //Token::IF => self.if_expr(),
+            Token::IF => self.if_expr(),
             _ => Err("Test"),
         };
     }
 
-    /*
-    fn if_expr(&mut self) {
+    
+    fn if_expr(&mut self) -> Result<Exp, ErrorType> {
         self.eat(&Token::IF);
+        let guard = self.expr()?;
+        self.eat(&Token::THEN);
+        let thn = self.expr()?;
+        self.eat(&Token::ELSE);
+        let els = self.expr()?;
+
+        Ok(Exp::IfExp(Box::new(guard), Box::new(thn), Box::new(els)))
         
     }
-     */
+     
 
     // Not tested - maybe not in primary exp?
     fn bool_exp(&mut self) -> Result<Exp, ErrorType> {

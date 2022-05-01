@@ -81,6 +81,16 @@ impl Interpreter {
                 }
                 return result;
             }
+            Exp::IfExp(g, thn, els) => {
+                let guard = self.eval(*g);
+                let val = match guard {
+                    Val::BoolVal(b) => b,
+                    _ => panic!("Guard was not a boolean value")
+                };
+                // Return the expression in the appropiate branch
+                return if val {self.eval(*thn)} else {self.eval(*els)}
+
+            }
             _ => Val::Undefined,
         };
     }

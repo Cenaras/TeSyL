@@ -25,10 +25,10 @@ UnOp := -
 *The grammar will be displayed here, once it is ready. The grammar is a work in progress.*
 
 ### Remaining Work:
- * Construct (minimal) Grammar
- * Implement (minimal) lexer
- * Implement (minimal) parser
- * Implement (minimal) interpreter
+ * Construct ~~(minimal)~~ Grammar
+ * Implement ~~(minimal)~~ lexer
+ * Implement ~~(minimal)~~ parser
+ * Implement ~~(minimal)~~ interpreter
  * Design terrible syntax 
  * Expand Lexer, Parser, Interpreter
  * Optimization/Benchmarking work
@@ -54,4 +54,13 @@ cargo run arith.tsl --test -lex
 cargo run arith.tsl --test -par
 cargo run arith.tsl --test -int
 ```
-will first run the lexing, and compare the result with the file in */expected/lexing/arith.lex* and then likewise for parsing with */expected/parsing/arith.par* and finally for interpretation with */expected/runtime/arith.int*
+will first run the lexing, and compare the result with the file in */expected/lexing/arith.lex* and then likewise for parsing with */expected/parsing/arith.par* and finally for interpretation with */expected/runtime/arith.int*  
+
+One can also choose to run all tests of a given type. For now, this still requires specifying a specific file, but every file will be ran. 
+**EXAMPLE**
+```
+cargo run arith-tsl --test -lex --all
+cargo run arith-tsl --test -par --all
+cargo run arith-tsl --test -int --all
+```
+will run all samples files and compare them against their expected in the */lexing* directory, and likewise for parsing and interpretation.
