@@ -1,0 +1,9 @@
+While, Function Def, Function Call, ...
+Wrap Guards in () at parser?
+Increment assignments
+Real tests - fib with while loop, function call when ready.
+
+
+Add Operational Semantics document, and keep up to date.
+Benchmark tests - Ackermann number.
+

@@ -146,6 +146,7 @@ impl Parser {
             Token::OpenBrack => self.seq_expr(),
             Token::TRUE | Token::FALSE => self.bool_exp(),
             Token::IF => self.if_expr(),
+            Token::WHILE => self.while_expr(),
             _ => Err("Test"),
         };
     }
@@ -159,6 +160,13 @@ impl Parser {
         let els = self.expr()?;
 
         Ok(Exp::IfExp(Box::new(guard), Box::new(thn), Box::new(els)))
+    }
+
+    fn while_expr(&mut self) -> Result<Exp, ErrorType> {
+        self.eat(&Token::WHILE);
+        let guard = self.expr()?;
+        let body = self.expr()?;
+        Ok(Exp::WhileExp(Box::new(guard), Box::new(body)))
     }
 
     // Not tested - maybe not in primary exp?

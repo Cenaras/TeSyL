@@ -1,0 +1,7 @@
+SeqExp([
+    LetExp("x", IntExp(0)), 
+    WhileExp(BinOpExp(VarExp("x"), LessThanBinOp, IntExp(5)), 
+        SeqExp([
+            AssignmentExp("x", BinOpExp(VarExp("x"), PlusBinOp, IntExp(1)))
+            ])), 
+    VarExp("x")])

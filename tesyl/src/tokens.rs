@@ -21,6 +21,7 @@ pub enum Token {
     ELSE,
     TRUE,
     FALSE,
+    WHILE,
     OpenParen,
     CloseParen,
     OpenBrack,
@@ -60,12 +61,14 @@ impl fmt::Display for Token {
             Token::IF => write!(f, "[IF] "),
             Token::THEN => write!(f, "[THEN] "),
             Token::ELSE => write!(f, "[ELSE] "),
+            Token::WHILE => write!(f, "[WHILE] "),
             Token::TRUE => write!(f, "[TRUE] "),
             Token::FALSE => write!(f, "[FALSE] "),
             Token::OpenParen => write!(f, "[OPENPAREN] "),
             Token::CloseParen => write!(f, "[CLOSEPAREN] "),
             Token::OpenBrack => write!(f, "[OPENBRACK] "),
             Token::CloseBrack => write!(f, "[CLOSEBRACK] "),
+            
             _ => write!(f, "Not Implemented "),
         }
     }

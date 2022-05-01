@@ -15,6 +15,7 @@ pub enum Exp {
     AssignmentExp(Id, Box<Exp>),
     SeqExp(Vec<Exp>),
     IfExp(Box<Exp>, Box<Exp>, Box<Exp>),
+    WhileExp(Box<Exp>, Box<Exp>),
     UnitExp,
     //Undefined,
 }
@@ -55,6 +56,7 @@ impl fmt::Display for Exp {
             Exp::AssignmentExp(id, exp) => write!(f, "AssignmentExp({}, {})", id, exp),
             Exp::SeqExp(l) => write!(f, "SeqExp({:?})", l),
             Exp::IfExp(guard, then, els) => write!(f, "IfExp({}, {}, {})", guard, then, els),
+            Exp::WhileExp(guard, body) => write!(f, "WhileExp({}, {})", guard, body),
             Exp::UnitExp => write!(f, "UnitExp"),
             //Exp::Undefined => write!(f, "Undefined"),
             //_ => write!(f, "Not Implemented "),

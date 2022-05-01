@@ -2,9 +2,8 @@
 #[derive(PartialEq, Clone)]
 pub enum Val {
     IntVal(i32),
-    UnitVal,
     BoolVal(bool),
-    Undefined,
+    UnitVal,
 }
 
 use std::fmt::{self};

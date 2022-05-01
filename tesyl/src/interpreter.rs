@@ -136,6 +136,20 @@ impl Interpreter {
                     self.eval(*els)
                 };
             }
+            // If false, return unit. Else eval body and eval while again. Need temps to satisfy safety
+            Exp::WhileExp(ref g, ref b) => {
+                let temp_guard = g.clone();
+                let guard = self.eval(*temp_guard);
+                match guard {
+                    Val::BoolVal(false) => return Val::UnitVal,
+                    Val::BoolVal(true) => {
+                        let temp_body = b.clone();
+                        let body = self.eval(*temp_body);
+                        self.eval(e)
+                    }
+                    _ => panic!("Guard for while was not a boolean")
+                }
+            }
             Exp::UnitExp => Val::UnitVal, //_ => Val::Undefined,
         };
     }
