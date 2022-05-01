@@ -14,6 +14,7 @@ pub enum Exp {
     LetExp(Id, Box<Exp>),
     SeqExp(Vec<Exp>),
     IfExp(Box<Exp>, Box<Exp>, Box<Exp>),
+    UnitExp,
     //Undefined,
 }
 
@@ -52,6 +53,7 @@ impl fmt::Display for Exp {
             Exp::LetExp(x, v) => write!(f, "LetExp({}, {})", x, v),
             Exp::SeqExp(l) => write!(f, "SeqExp({:?})", l),
             Exp::IfExp(guard, then, els) => write!(f, "IfExp({}, {}, {})", guard, then, els),
+            Exp::UnitExp => write!(f, "UnitExp"),
             //Exp::Undefined => write!(f, "Undefined"),
             //_ => write!(f, "Not Implemented "),
         }

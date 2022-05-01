@@ -44,7 +44,14 @@ impl Parser {
 
     // Placeholder for now.
     fn expr(&mut self) -> Result<Exp, ErrorType> {
-        return self.relational_expr();
+        return match self.tokens.peek().unwrap() {
+            Token::EOF => Ok(Exp::UnitExp),
+            _ => self.relational_expr(),
+
+        };
+
+
+        //return self.relational_expr();
         //return self.additive_expr();
     }
 
@@ -187,14 +194,12 @@ impl Parser {
         // "While self.tokens.peek destructs into SEMICOLON, do the following..."
         while let Token::SEMICOLON = self.tokens.peek().unwrap() {
             self.eat(&Token::SEMICOLON);
-            println!("Ate!\n");
-            println!("Next token is: {}", self.tokens.peek().unwrap());
-            let test = self.expr()?;
-            println!("Current contents: {:?}", expressions);
-            expressions.push(test);
+         
+            expressions.push(self.expr()?);
         }
-
+        
         self.eat(&Token::CloseParen);
+
         Ok(Exp::SeqExp(expressions))
     }
 

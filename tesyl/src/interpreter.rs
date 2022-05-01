@@ -32,6 +32,7 @@ impl Interpreter {
 
     pub fn eval(&mut self, e: Exp) -> Val {
         // Debugging
+        println!("Program is: ");
         print_program(&e);
 
         return match e {
@@ -126,7 +127,9 @@ impl Interpreter {
                 } else {
                     self.eval(*els)
                 };
-            } //_ => Val::Undefined,
+            }
+            Exp::UnitExp => Val::UnitVal 
+            //_ => Val::Undefined,
         };
     }
 }
