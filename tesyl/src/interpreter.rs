@@ -45,19 +45,19 @@ impl Interpreter {
                     BinOp::PlusBinOp => match (left, right) {
                         (Val::IntVal(v1), Val::IntVal(v2)) => Val::IntVal(v1 + v2),
                         _ => {
-                            panic!("Error plus")
+                            panic!("Expected two integers for plus")
                         }
                     },
                     BinOp::MinusBinOp => match (left, right) {
                         (Val::IntVal(v1), Val::IntVal(v2)) => Val::IntVal(v1 - v2),
                         _ => {
-                            panic!("Error minus")
+                            panic!("Expected two integers for minus")
                         }
                     },
                     BinOp::TimesBinOp => match (left, right) {
                         (Val::IntVal(v1), Val::IntVal(v2)) => Val::IntVal(v1 * v2),
                         _ => {
-                            panic!("Error times")
+                            panic!("Expected two integers for multiplication")
                         }
                     },
                     BinOp::DivideBinOp => match (left, right) {
@@ -68,34 +68,34 @@ impl Interpreter {
                             Val::IntVal(v1 / v2)
                         }
                         _ => {
-                            panic!("Error divide")
+                            panic!("Expected two integers for division")
                         }
                     },
                     BinOp::EqualBinOp => match (left, right) {
                         (Val::IntVal(v1), Val::IntVal(v2)) => Val::BoolVal(v1 == v2),
                         (Val::BoolVal(v1), Val::BoolVal(v2)) => Val::BoolVal(v1 == v2),
-                        _ => panic!("Error for equals"),
+                        _ => panic!("Incomparable types used for boolean equality"),
                     },
                     BinOp::NotEqualBinOp => match (left, right) {
                         (Val::IntVal(v1), Val::IntVal(v2)) => Val::BoolVal(v1 != v2),
                         (Val::BoolVal(v1), Val::BoolVal(v2)) => Val::BoolVal(v1 != v2),
-                        _ => panic!("Error for not equals"),
+                        _ => panic!("Incomparable types used for boolean equality"),
                     },
                     BinOp::GreaterThanBinOp => match (left, right) {
                         (Val::IntVal(v1), Val::IntVal(v2)) => Val::BoolVal(v1 > v2),
-                        _ => panic!("Error for >"),
+                        _ => panic!("Incomparable types used for boolean comparision >"),
                     },
                     BinOp::GreaterThanEqualBinOp => match (left, right) {
                         (Val::IntVal(v1), Val::IntVal(v2)) => Val::BoolVal(v1 >= v2),
-                        _ => panic!("Error for >="),
+                        _ => panic!("Incomparable types used for boolean comparision >="),
                     },
                     BinOp::LessThanBinOp => match (left, right) {
                         (Val::IntVal(v1), Val::IntVal(v2)) => Val::BoolVal(v1 < v2),
-                        _ => panic!("Error for <"),
+                        _ => panic!("Incomparable types used for boolean comparision <"),
                     },
                     BinOp::LessThenEqualBinOp => match (left, right) {
                         (Val::IntVal(v1), Val::IntVal(v2)) => Val::BoolVal(v1 <= v2),
-                        _ => panic!("Error for <="),
+                        _ => panic!("Incomparable types used for boolean comparision <="),
                     },
                 }
             }
@@ -126,7 +126,7 @@ impl Interpreter {
                 let guard = self.eval(*g);
                 let val = match guard {
                     Val::BoolVal(b) => b,
-                    _ => panic!("Guard was not a boolean value"),
+                    _ => panic!("Expected guard to be a boolean value for if statement"),
                 };
                 // Return the expression in the appropiate branch
                 return if val {
@@ -146,7 +146,7 @@ impl Interpreter {
                         let body = self.eval(*temp_body);
                         self.eval(e)
                     }
-                    _ => panic!("Guard for while was not a boolean"),
+                    _ => panic!("Expected guard to be a boolean value for while loop"),
                 }
             }
             Exp::UnitExp => Val::UnitVal, //_ => Val::Undefined,

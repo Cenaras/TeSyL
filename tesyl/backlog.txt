@@ -1,9 +1,10 @@
 While, Function Def, Function Call, ...
 Wrap Guards in () at parser?
 Increment assignments
+Unary expressions - minus and negate
 Real tests - fib with while loop, function call when ready.
-
+Proper error messages.
 
 Add Operational Semantics document, and keep up to date.
 Benchmark tests - Ackermann number.
-
+Refactor and optimize code - use more rust built-in features.
