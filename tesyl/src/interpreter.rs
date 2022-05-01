@@ -11,6 +11,9 @@ use crate::Exp;
 type Id = String;
 type Env = HashMap<Id, Val>;
 
+
+
+
 pub struct Interpreter {
     env: Env,
 }
@@ -19,6 +22,15 @@ impl Interpreter {
     pub fn new() -> Interpreter {
         let map: HashMap<Id, Val> = HashMap::new();
         Interpreter { env: map }
+    }
+
+    // Default value is 0 - either this or error depending on what we want.
+    fn get_or_else(&mut self, key: Id) -> Val {
+        let mut temp_map = self.env.clone();
+        return match temp_map.remove(&key) {
+            Some(val) => val,
+            None => Val::IntVal(0),
+        };
     }
 
     pub fn eval(&mut self, e: Exp) -> Val {
@@ -70,9 +82,7 @@ impl Interpreter {
                 Val::UnitVal
             }
             Exp::VarExp(id) => {
-                // Copy map, remove entry to gain ownership.
-                let temp_map = &mut self.env; //Maybe find better way than map copy
-                temp_map.remove(&id).unwrap()
+                self.get_or_else(id) // Default value for undeclared is 0.
             }
             Exp::SeqExp(expressions) => {
                 let mut result = Val::UnitVal; // If empty, return unit

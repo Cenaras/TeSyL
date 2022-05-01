@@ -1,5 +1,6 @@
 //Possible values of program execution
 #[derive(PartialEq)]
+#[derive(Clone)]
 pub enum Val {
     IntVal(i32),
     UnitVal,
