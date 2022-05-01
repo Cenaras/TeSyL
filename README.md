@@ -15,10 +15,11 @@ The grammar of TeSyL follows an functional style where everything is an expressi
 
 Program := Exp
 
-Exp := Int | Exp BinOp Exp | UnOp Exp | Let Exp = Exp | If Exp then Exp else Exp | ( Exp ; ... ; Exp ) |  
-Int := 1 | 2 | 3 | ...  
-BinOp := + | - | * | / | > | < | =  
-UnOp := - 
+Exp := Int | Exp BinOp Exp | UnOp Exp | Let Id = Exp | Id = Exp | If Exp then Exp else Exp | { Exp ; ... ; Exp } |  
+Int := -3 | -2 | -1 | 0 | 1 | 2 | 3 | ...  
+BinOp := + | - | * | / | > | < | <= | >= | =  
+UnOp := -  
+Id := x | y | z | ...
 
 
 
