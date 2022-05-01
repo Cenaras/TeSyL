@@ -22,11 +22,27 @@ use interpreter::Interpreter;
 
 // Path is from current terminal path. Call from root of project
 
+fn real_test(file: String) {
+    assert_correct_format(&file);
+    let mut interpreter = Interpreter::new();
+    let result = interpreter.eval(
+        Parser::new(
+            Lexer::real(file).unwrap().lex())
+            .parse_program().unwrap());
+    println!("Program terminated with result: \n{}\n", result);
+}
 fn main() {
     // Mutable, since the iterator updates the state after each .next call
     let mut args = std::env::args().skip(1);
     let filename = args.next().expect("No file was specified");
     let test_filename = filename.clone();
+
+    if (filename == "--run") {
+        let file = args.next().expect("No file specified");
+        real_test(file);
+        return;
+    }
+
 
     let do_test = match args.next() {
         Some(t) => t.as_str() == "--test" || t.as_str() == "-t",
@@ -214,3 +230,5 @@ fn assert_correct_format(file: &String) {
         panic!("File does not end in .tsl, which is the expected format");
     }
 }
+
+

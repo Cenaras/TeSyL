@@ -20,6 +20,11 @@ impl Lexer {
         Ok(Lexer { raw: contents })
     }
 
+    pub fn real(program: String) -> Result<Lexer, std::io::Error> {
+        let contents = std::fs::read_to_string(format!(".\\programs\\{}", program))?;
+        Ok(Lexer {raw: contents})
+    }
+
     pub fn lex(&self) -> Vec<Token> {
         let mut tokens_list: Vec<Token> = Vec::new();
         let mut iter = self.raw.chars().into_iter().peekable();

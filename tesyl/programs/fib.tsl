@@ -1,0 +1,14 @@
+{
+    let a = 40;
+    let x = 1;
+    let y = 0;
+    let z = 0;
+    let i = 0;
+    while i < a {
+        z = x + y;
+        x = y;
+        y = z;
+        i = i + 1
+    };
+    z
+}
