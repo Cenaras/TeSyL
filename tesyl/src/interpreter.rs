@@ -128,8 +128,7 @@ impl Interpreter {
                     self.eval(*els)
                 };
             }
-            Exp::UnitExp => Val::UnitVal 
-            //_ => Val::Undefined,
+            Exp::UnitExp => Val::UnitVal, //_ => Val::Undefined,
         };
     }
 }

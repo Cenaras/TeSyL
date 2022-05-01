@@ -47,9 +47,7 @@ impl Parser {
         return match self.tokens.peek().unwrap() {
             Token::EOF => Ok(Exp::UnitExp),
             _ => self.relational_expr(),
-
         };
-
 
         //return self.relational_expr();
         //return self.additive_expr();
@@ -145,7 +143,7 @@ impl Parser {
             Token::IntLit(v) => self.int_lit(),
             Token::LET => self.let_expr(),
             Token::Identifier(id) => self.var_expr(), // Probably also add call exp to this one later...
-            Token::OpenParen => self.seq_expr(),
+            Token::OpenBrack => self.seq_expr(),
             Token::TRUE | Token::FALSE => self.bool_exp(),
             Token::IF => self.if_expr(),
             _ => Err("Test"),
@@ -187,18 +185,18 @@ impl Parser {
     }
 
     fn seq_expr(&mut self) -> Result<Exp, ErrorType> {
-        self.eat(&Token::OpenParen);
+        self.eat(&Token::OpenBrack);
 
         let mut expressions = vec![self.expr()?];
 
         // "While self.tokens.peek destructs into SEMICOLON, do the following..."
         while let Token::SEMICOLON = self.tokens.peek().unwrap() {
             self.eat(&Token::SEMICOLON);
-         
+
             expressions.push(self.expr()?);
         }
-        
-        self.eat(&Token::CloseParen);
+
+        self.eat(&Token::CloseBrack);
 
         Ok(Exp::SeqExp(expressions))
     }
