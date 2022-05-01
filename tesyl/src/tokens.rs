@@ -68,7 +68,7 @@ impl fmt::Display for Token {
             Token::CloseParen => write!(f, "[CLOSEPAREN] "),
             Token::OpenBrack => write!(f, "[OPENBRACK] "),
             Token::CloseBrack => write!(f, "[CLOSEBRACK] "),
-            
+
             _ => write!(f, "Not Implemented "),
         }
     }

@@ -22,7 +22,7 @@ impl Lexer {
 
     pub fn real(program: String) -> Result<Lexer, std::io::Error> {
         let contents = std::fs::read_to_string(format!(".\\programs\\{}", program))?;
-        Ok(Lexer {raw: contents})
+        Ok(Lexer { raw: contents })
     }
 
     pub fn lex(&self) -> Vec<Token> {

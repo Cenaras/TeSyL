@@ -6,8 +6,7 @@ use crate::print_program;
 use crate::val::Val;
 use crate::Exp;
 
-// Make env = map[id, val]
-// make val type
+// Map identifiers to their values
 type Id = String;
 type Env = HashMap<Id, Val>;
 
@@ -35,6 +34,7 @@ impl Interpreter {
         println!("Program is: ");
         print_program(&e);
 
+        // Match top level expression and recursively compute sub terms.
         return match e {
             Exp::IntExp(v) => Val::IntVal(v),
             Exp::BoolExp(b) => Val::BoolVal(b),
@@ -113,9 +113,8 @@ impl Interpreter {
                 self.env.insert(id, val);
                 Val::UnitVal
             }
-            Exp::VarExp(id) => {
-                self.get_or_else(id) // Default value for undeclared is error
-            }
+            // Require defined variaible or throw error.
+            Exp::VarExp(id) => self.get_or_else(id),
             Exp::SeqExp(expressions) => {
                 let mut result = Val::UnitVal; // If empty, return unit
                 for expr in expressions {
@@ -147,7 +146,7 @@ impl Interpreter {
                         let body = self.eval(*temp_body);
                         self.eval(e)
                     }
-                    _ => panic!("Guard for while was not a boolean")
+                    _ => panic!("Guard for while was not a boolean"),
                 }
             }
             Exp::UnitExp => Val::UnitVal, //_ => Val::Undefined,
