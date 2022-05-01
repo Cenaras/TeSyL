@@ -1,0 +1,12 @@
+SeqExp(
+    [LetExp("x", IntExp(2)), 
+    IfExp(BinOpExp(VarExp("x"), GreaterThanBinOp, IntExp(3)), 
+        SeqExp([
+            LetExp("y", IntExp(2)), 
+            BinOpExp(IntExp(2), TimesBinOp, VarExp("y"))
+        ]), 
+        SeqExp([
+            LetExp("y", IntExp(3)), 
+            BinOpExp(IntExp(3), TimesBinOp, VarExp("y"))
+        ]))
+    ])
