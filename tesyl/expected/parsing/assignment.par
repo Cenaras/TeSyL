@@ -1,0 +1,5 @@
+SeqExp([
+    LetExp("x", IntExp(2)), 
+    AssignmentExp("x", IntExp(3)),
+    VarExp("x")
+])

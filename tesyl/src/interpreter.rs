@@ -21,12 +21,12 @@ impl Interpreter {
         Interpreter { env: map }
     }
 
-    // Default value is 0 - either this or error depending on what we want.
+    // Default value is error
     fn get_or_else(&mut self, key: Id) -> Val {
         let mut temp_map = self.env.clone();
         return match temp_map.remove(&key) {
             Some(val) => val,
-            None => Val::IntVal(0),
+            None => panic!("{} is not declared with a let", key),
         };
     }
 
@@ -105,8 +105,16 @@ impl Interpreter {
                 self.env.insert(id, val);
                 Val::UnitVal
             }
+            Exp::AssignmentExp(id, expr) => {
+                // Check if defined.
+                let temp_id = id.clone();
+                self.get_or_else(temp_id);
+                let val = self.eval(*expr);
+                self.env.insert(id, val);
+                Val::UnitVal
+            }
             Exp::VarExp(id) => {
-                self.get_or_else(id) // Default value for undeclared is 0.
+                self.get_or_else(id) // Default value for undeclared is error
             }
             Exp::SeqExp(expressions) => {
                 let mut result = Val::UnitVal; // If empty, return unit

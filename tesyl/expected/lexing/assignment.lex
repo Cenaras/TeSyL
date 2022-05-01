@@ -1,0 +1,6 @@
+[OPENBRACK] 
+    [LET] [Identifier(x)] [EQUAL] [IntLit(2)] [SEMICOLON] 
+    [Identifier(x)] [EQUAL] [IntLit(3)] [SEMICOLON] 
+    [Identifier(x)] 
+[CLOSEBRACK] 
+[EOF] 

@@ -181,7 +181,17 @@ impl Parser {
         let id = self.identifier();
         let id_temp = id.clone();
         self.eat(&Token::Identifier(id_temp));
-        Ok(Exp::VarExp(id))
+
+        return match self.tokens.peek() {
+            Some(Token::EQUAL) => self.assign_expr(id),
+            _ => Ok(Exp::VarExp(id)),
+        };
+    }
+
+    fn assign_expr(&mut self, id: String) -> Result<Exp, ErrorType> {
+        self.eat(&Token::EQUAL);
+        let expr = self.expr()?;
+        Ok(Exp::AssignmentExp(id, Box::new(expr)))
     }
 
     fn seq_expr(&mut self) -> Result<Exp, ErrorType> {
