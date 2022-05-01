@@ -11,9 +11,6 @@ use crate::Exp;
 type Id = String;
 type Env = HashMap<Id, Val>;
 
-
-
-
 pub struct Interpreter {
     env: Env,
 }
@@ -73,6 +70,32 @@ impl Interpreter {
                             panic!("Error divide")
                         }
                     },
+                    BinOp::EqualBinOp => match (left, right) {
+                        (Val::IntVal(v1), Val::IntVal(v2)) => Val::BoolVal(v1 == v2),
+                        (Val::BoolVal(v1), Val::BoolVal(v2)) => Val::BoolVal(v1 == v2),
+                        _ => panic!("Error for equals"),
+                    },
+                    BinOp::NotEqualBinOp => match (left, right) {
+                        (Val::IntVal(v1), Val::IntVal(v2)) => Val::BoolVal(v1 != v2),
+                        (Val::BoolVal(v1), Val::BoolVal(v2)) => Val::BoolVal(v1 != v2),
+                        _ => panic!("Error for not equals"),
+                    },
+                    BinOp::GreaterThanBinOp => match (left, right) {
+                        (Val::IntVal(v1), Val::IntVal(v2)) => Val::BoolVal(v1 > v2),
+                        _ => panic!("Error for >"),
+                    },
+                    BinOp::GreaterThanEqualBinOp => match (left, right) {
+                        (Val::IntVal(v1), Val::IntVal(v2)) => Val::BoolVal(v1 >= v2),
+                        _ => panic!("Error for >="),
+                    },
+                    BinOp::LessThanBinOp => match (left, right) {
+                        (Val::IntVal(v1), Val::IntVal(v2)) => Val::BoolVal(v1 < v2),
+                        _ => panic!("Error for <"),
+                    },
+                    BinOp::LessThenEqualBinOp => match (left, right) {
+                        (Val::IntVal(v1), Val::IntVal(v2)) => Val::BoolVal(v1 <= v2),
+                        _ => panic!("Error for <="),
+                    },
                 }
             }
             // Update environment. LetExp returns Unit
@@ -95,13 +118,15 @@ impl Interpreter {
                 let guard = self.eval(*g);
                 let val = match guard {
                     Val::BoolVal(b) => b,
-                    _ => panic!("Guard was not a boolean value")
+                    _ => panic!("Guard was not a boolean value"),
                 };
                 // Return the expression in the appropiate branch
-                return if val {self.eval(*thn)} else {self.eval(*els)}
-
-            }
-            _ => Val::Undefined,
+                return if val {
+                    self.eval(*thn)
+                } else {
+                    self.eval(*els)
+                };
+            } //_ => Val::Undefined,
         };
     }
 }

@@ -1,0 +1,1 @@
+[IntLit(1)] [GEQ] [IntLit(2)][EOF]

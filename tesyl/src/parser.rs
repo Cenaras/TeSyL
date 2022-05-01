@@ -44,8 +44,93 @@ impl Parser {
 
     // Placeholder for now.
     fn expr(&mut self) -> Result<Exp, ErrorType> {
-        return self.additive_expr();
-        //return self.primary_expr();
+        return self.relational_expr();
+        //return self.additive_expr();
+    }
+
+    // Non tested. Top level
+    fn relational_expr(&mut self) -> Result<Exp, ErrorType> {
+        let mut left = self.additive_expr()?;
+        loop {
+            let op = match self.tokens.peek() {
+                Some(Token::EQUAL) => {
+                    self.eat(&Token::EQUAL);
+                    BinOp::EqualBinOp
+                }
+                Some(Token::NEQ) => {
+                    self.eat(&Token::NEQ);
+                    BinOp::NotEqualBinOp
+                }
+                Some(Token::GE) => {
+                    self.eat(&Token::GE);
+                    BinOp::GreaterThanBinOp
+                }
+                Some(Token::GEQ) => {
+                    self.eat(&Token::GEQ);
+                    BinOp::GreaterThanEqualBinOp
+                }
+                Some(Token::LE) => {
+                    self.eat(&Token::LE);
+                    BinOp::LessThanBinOp
+                }
+                Some(Token::LEQ) => {
+                    self.eat(&Token::LEQ);
+                    BinOp::LessThenEqualBinOp
+                }
+                _ => break,
+            };
+
+            let right = self.additive_expr()?;
+            left = Exp::BinOpExp(Box::new(left), op, Box::new(right))
+        }
+        Ok(left)
+    }
+
+    fn additive_expr(&mut self) -> Result<Exp, ErrorType> {
+        let mut left = self.multiplicative_expr()?;
+
+        loop {
+            let op = match self.tokens.peek() {
+                Some(Token::PLUS) => {
+                    self.eat(&Token::PLUS);
+                    BinOp::PlusBinOp
+                }
+                Some(Token::MINUS) => {
+                    self.eat(&Token::MINUS);
+                    BinOp::MinusBinOp
+                }
+                _ => break,
+            };
+
+            let right = self.multiplicative_expr()?;
+            left = Exp::BinOpExp(Box::new(left), op, Box::new(right))
+        }
+        Ok(left)
+    }
+
+    // Takes primary exps or unary
+
+    // Either parse two expressions as a multiplicative expression and combine into one, or simply parse a primary expression if not multiplicative.
+    fn multiplicative_expr(&mut self) -> Result<Exp, ErrorType> {
+        let mut left = self.primary_expr()?; // unary when implemented, and let unary call primary if non unary
+
+        loop {
+            let op = match self.tokens.peek() {
+                Some(Token::TIMES) => {
+                    self.eat(&Token::TIMES);
+                    BinOp::TimesBinOp
+                }
+                Some(Token::DIVIDE) => {
+                    self.eat(&Token::DIVIDE);
+                    BinOp::DivideBinOp
+                }
+                _ => break,
+            };
+
+            let right = Box::new(self.primary_expr()?);
+            left = Exp::BinOpExp(Box::new(left), op, right)
+        }
+        Ok(left)
     }
 
     fn primary_expr(&mut self) -> Result<Exp, ErrorType> {
@@ -60,7 +145,6 @@ impl Parser {
         };
     }
 
-    
     fn if_expr(&mut self) -> Result<Exp, ErrorType> {
         self.eat(&Token::IF);
         let guard = self.expr()?;
@@ -70,15 +154,19 @@ impl Parser {
         let els = self.expr()?;
 
         Ok(Exp::IfExp(Box::new(guard), Box::new(thn), Box::new(els)))
-        
     }
-     
 
     // Not tested - maybe not in primary exp?
     fn bool_exp(&mut self) -> Result<Exp, ErrorType> {
         let val = match self.tokens.peek().unwrap() {
-            Token::TRUE => {self.eat(&Token::TRUE); true},
-            Token::FALSE => {self.eat(&Token::TRUE); false},
+            Token::TRUE => {
+                self.eat(&Token::TRUE);
+                true
+            }
+            Token::FALSE => {
+                self.eat(&Token::TRUE);
+                false
+            }
             _ => panic!("Could not parse boolean expression"),
         };
         Ok(Exp::BoolExp(val))
@@ -148,52 +236,5 @@ impl Parser {
         };
         self.eat(&Token::IntLit(value));
         return intlit;
-    }
-
-    fn additive_expr(&mut self) -> Result<Exp, ErrorType> {
-        let mut left = self.multiplicative_expr()?;
-
-        loop {
-            let op = match self.tokens.peek() {
-                Some(Token::PLUS) => {
-                    self.eat(&Token::PLUS);
-                    BinOp::PlusBinOp
-                }
-                Some(Token::MINUS) => {
-                    self.eat(&Token::MINUS);
-                    BinOp::MinusBinOp
-                }
-                _ => break,
-            };
-
-            let right = self.multiplicative_expr()?;
-            left = Exp::BinOpExp(Box::new(left), op, Box::new(right))
-        }
-        Ok(left)
-    }
-
-    // Takes primary exps or unary
-
-    // Either parse two expressions as a multiplicative expression and combine into one, or simply parse a primary expression if not multiplicative.
-    fn multiplicative_expr(&mut self) -> Result<Exp, ErrorType> {
-        let mut left = self.primary_expr()?; // unary when implemented, and let unary call primary if non unary
-
-        loop {
-            let op = match self.tokens.peek() {
-                Some(Token::TIMES) => {
-                    self.eat(&Token::TIMES);
-                    BinOp::TimesBinOp
-                }
-                Some(Token::DIVIDE) => {
-                    self.eat(&Token::DIVIDE);
-                    BinOp::DivideBinOp
-                }
-                _ => break,
-            };
-
-            let right = Box::new(self.primary_expr()?);
-            left = Exp::BinOpExp(Box::new(left), op, right)
-        }
-        Ok(left)
     }
 }

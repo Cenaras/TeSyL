@@ -23,6 +23,12 @@ pub enum BinOp {
     MinusBinOp,
     TimesBinOp,
     DivideBinOp,
+    EqualBinOp,
+    NotEqualBinOp,
+    GreaterThanBinOp,
+    GreaterThanEqualBinOp,
+    LessThanBinOp,
+    LessThenEqualBinOp,
 }
 
 /*pub fn bin_op_exp_from_token(token: &Token) -> BinOp {
@@ -59,6 +65,12 @@ impl fmt::Display for BinOp {
             BinOp::MinusBinOp => write!(f, "-"),
             BinOp::TimesBinOp => write!(f, "*"),
             BinOp::DivideBinOp => write!(f, "/"),
+            BinOp::EqualBinOp => write!(f, "="),
+            BinOp::NotEqualBinOp => write!(f, "!="),
+            BinOp::GreaterThanBinOp => write!(f, ">"),
+            BinOp::GreaterThanEqualBinOp => write!(f, ">="),
+            BinOp::LessThanBinOp => write!(f, "<"),
+            BinOp::LessThenEqualBinOp => write!(f, "<="),
         }
     }
 }

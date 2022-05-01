@@ -75,9 +75,34 @@ fn get_token(iter: &mut Peekable<Chars>) -> Token {
                 '*' => Token::TIMES,
                 '/' => Token::DIVIDE,
                 ';' => Token::SEMICOLON,
-                '>' => Token::GE,
-                '<' => Token::LE,
+                '>' => {
+                    match iter.peek() {
+                        Some('=') => {
+                            iter.next(); // consume the =
+                            return Token::GEQ;
+                        }
+                        _ => return Token::GE,
+                    }
+                }
+                '<' => {
+                    match iter.peek() {
+                        Some('=') => {
+                            iter.next(); // consume the =
+                            return Token::LEQ;
+                        }
+                        _ => return Token::LE,
+                    }
+                }
                 '=' => Token::EQUAL,
+                '!' => {
+                    match iter.peek() {
+                        Some('=') => {
+                            iter.next(); // consume the =
+                            return Token::NEQ;
+                        }
+                        _ => return Token::NOT,
+                    }
+                }
                 '(' => Token::OpenParen,
                 ')' => Token::CloseParen,
                 _ => Token::INVALID,
