@@ -147,8 +147,14 @@ impl Parser {
             Token::TRUE | Token::FALSE => self.bool_exp(),
             Token::IF => self.if_expr(),
             Token::WHILE => self.while_expr(),
+            Token::OpenParen => self.tuple_expr(),
             _ => Err("Test"),
         };
+    }
+
+
+    fn tuple_expr(&mut self) -> Result<Exp, ErrorType> {
+        panic!("Not implemented")
     }
 
     fn if_expr(&mut self) -> Result<Exp, ErrorType> {

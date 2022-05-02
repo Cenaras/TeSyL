@@ -4,6 +4,7 @@ Increment assignments
 Unary expressions - minus and negate
 Real tests - fib with while loop, function call when ready.
 Proper error messages.
+Tuple values - allow pair-wise computations for BinOps.
 
 Add Operational Semantics document, and keep up to date.
 Benchmark tests - Ackermann number.
