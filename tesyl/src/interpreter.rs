@@ -45,7 +45,7 @@ impl Interpreter {
                     BinOp::PlusBinOp => match (left, right) {
                         (Val::IntVal(v1), Val::IntVal(v2)) => Val::IntVal(v1 + v2),
                         (Val::TupleVal(v1, v2), Val::TupleVal(v3, v4)) => {
-                            match (*v1, *v2, *v3, *v4) {
+                            match (*v1, *v2, *v3, *v4) { // Only support for (a, b) + (c, b) for a, b, c, d being ints.
                                 (
                                     Val::IntVal(val1),
                                     Val::IntVal(val2),
