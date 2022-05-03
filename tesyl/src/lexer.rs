@@ -80,6 +80,7 @@ fn get_token(iter: &mut Peekable<Chars>) -> Token {
                 '*' => Token::TIMES,
                 '/' => Token::DIVIDE,
                 ';' => Token::SEMICOLON,
+                ',' => Token::COMMA,
                 '>' => {
                     match iter.peek() {
                         Some('=') => {

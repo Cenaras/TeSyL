@@ -3,6 +3,7 @@
 pub enum Val {
     IntVal(i32),
     BoolVal(bool),
+    TupleVal(Box<Val>, Box<Val>),
     UnitVal,
 }
 
@@ -13,6 +14,7 @@ impl fmt::Display for Val {
             Val::IntVal(v) => write!(f, "{}", v),
             Val::UnitVal => write!(f, "()"),
             Val::BoolVal(b) => write!(f, "{}", b),
+            Val::TupleVal(v1, v2) => write!(f, "({}, {})", v1, v2),
             _ => write!(f, "Value not implemented "),
         }
     }

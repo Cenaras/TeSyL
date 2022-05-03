@@ -17,8 +17,8 @@ pub enum Exp {
     IfExp(Box<Exp>, Box<Exp>, Box<Exp>),
     WhileExp(Box<Exp>, Box<Exp>),
     UnitExp,
-    TupleExp(), // Vec of elements? In parser, comsume untill no more ','
-    //Undefined,
+    TupleExp(Box<Exp>, Box<Exp>), // Vec of elements? In parser, comsume untill no more ','. For now just 2
+                                  //Undefined,
 }
 
 #[derive(Debug, Clone)]
@@ -59,6 +59,7 @@ impl fmt::Display for Exp {
             Exp::IfExp(guard, then, els) => write!(f, "IfExp({}, {}, {})", guard, then, els),
             Exp::WhileExp(guard, body) => write!(f, "WhileExp({}, {})", guard, body),
             Exp::UnitExp => write!(f, "UnitExp"),
+            Exp::TupleExp(v1, v2) => write!(f, "TupleExp({}, {})", v1, v2),
             //Exp::Undefined => write!(f, "Undefined"),
             //_ => write!(f, "Not Implemented "),
         }

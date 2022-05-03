@@ -152,9 +152,14 @@ impl Parser {
         };
     }
 
-
     fn tuple_expr(&mut self) -> Result<Exp, ErrorType> {
-        panic!("Not implemented")
+        self.eat(&Token::OpenParen);
+        let v1 = self.expr()?;
+        self.eat(&Token::COMMA);
+        let v2 = self.expr()?;
+        self.eat(&Token::CloseParen);
+
+        Ok(Exp::TupleExp(Box::new(v1), Box::new(v2)))
     }
 
     fn if_expr(&mut self) -> Result<Exp, ErrorType> {

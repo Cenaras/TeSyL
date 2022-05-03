@@ -44,6 +44,20 @@ impl Interpreter {
                 match op {
                     BinOp::PlusBinOp => match (left, right) {
                         (Val::IntVal(v1), Val::IntVal(v2)) => Val::IntVal(v1 + v2),
+                        (Val::TupleVal(v1, v2), Val::TupleVal(v3, v4)) => {
+                            match (*v1, *v2, *v3, *v4) {
+                                (
+                                    Val::IntVal(val1),
+                                    Val::IntVal(val2),
+                                    Val::IntVal(val3),
+                                    Val::IntVal(val4),
+                                ) => Val::TupleVal(
+                                    Box::new(Val::IntVal(val1 + val3)),
+                                    Box::new(Val::IntVal(val2 + val4)),
+                                ),
+                                _ => panic!("Error"),
+                            }
+                        }
                         _ => {
                             panic!("Expected two integers for plus")
                         }
@@ -148,6 +162,12 @@ impl Interpreter {
                     }
                     _ => panic!("Expected guard to be a boolean value for while loop"),
                 }
+            }
+            // TODO: TupleAccess expression
+            Exp::TupleExp(v1, v2) => {
+                let first = self.eval(*v1);
+                let second = self.eval(*v2);
+                Val::TupleVal(Box::new(first), Box::new(second))
             }
             Exp::UnitExp => Val::UnitVal, //_ => Val::Undefined,
         };
