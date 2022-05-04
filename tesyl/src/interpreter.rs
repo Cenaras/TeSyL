@@ -8,30 +8,33 @@ use crate::Exp;
 
 // Map identifiers to their values
 type Id = String;
-type Env = HashMap<Id, Val>;
+type VarEnv = HashMap<Id, Val>;
+type FunEnv = HashMap<Id, Val>;
 
 pub struct Interpreter {
-    env: Env,
+    var_env: VarEnv,
+    fun_env: FunEnv,
 }
 
 impl Interpreter {
     pub fn new() -> Interpreter {
-        let map: HashMap<Id, Val> = HashMap::new();
-        Interpreter { env: map }
+        let var_map: HashMap<Id, Val> = HashMap::new();
+        let fun_map: HashMap<Id, Val> = HashMap::new();
+        Interpreter { var_env: var_map, fun_env: fun_map }
     }
 
     // Default value is error
     fn get_or_else(&mut self, key: Id) -> Val {
-        let mut temp_map = self.env.clone();
+        let mut temp_map = self.var_env.clone();
         return match temp_map.remove(&key) {
             Some(val) => val,
             None => panic!("{} is not declared with a let", key),
         };
     }
 
+    // Potentially pass environments with eval.
     pub fn eval(&mut self, e: Exp) -> Val {
         // Debugging
-        println!("Program is: ");
         print_program(&e);
 
         // Match top level expression and recursively compute sub terms.
@@ -116,7 +119,7 @@ impl Interpreter {
             // Update environment. LetExp returns Unit
             Exp::LetExp(id, exp) => {
                 let val = self.eval(*exp);
-                self.env.insert(id, val);
+                self.var_env.insert(id, val);
                 Val::UnitVal
             }
             Exp::AssignmentExp(id, expr) => {
@@ -124,7 +127,7 @@ impl Interpreter {
                 let temp_id = id.clone();
                 self.get_or_else(temp_id);
                 let val = self.eval(*expr);
-                self.env.insert(id, val);
+                self.var_env.insert(id, val);
                 Val::UnitVal
             }
             // Require defined variaible or throw error.
@@ -168,6 +171,14 @@ impl Interpreter {
                 let first = self.eval(*v1);
                 let second = self.eval(*v2);
                 Val::TupleVal(Box::new(first), Box::new(second))
+            }
+            Exp::FunDefExp(id, args, body) => {
+                let cur_var_env = self.var_env.clone();
+                let cur_fun_env = self.fun_env.clone();
+                let closure = Val::ClosureVal(args, body, cur_var_env, cur_fun_env);
+                
+                self.fun_env.insert(id, closure);
+                Val::UnitVal
             }
             Exp::UnitExp => Val::UnitVal, //_ => Val::Undefined,
         };

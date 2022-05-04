@@ -27,6 +27,7 @@ pub enum Token {
     OpenBrack,
     CloseBrack,
     COMMA,
+    FUNDEC,
     INVALID,
 }
 
@@ -70,6 +71,7 @@ impl fmt::Display for Token {
             Token::OpenBrack => write!(f, "[OPENBRACK] "),
             Token::CloseBrack => write!(f, "[CLOSEBRACK] "),
             Token::COMMA => write!(f, "[COMMA] "),
+            Token::FUNDEC => write!(f, "[DEF] "),
 
             _ => write!(f, "Not Implemented "),
         }

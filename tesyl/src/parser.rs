@@ -32,10 +32,15 @@ impl Parser {
     }
 
     fn eat(&mut self, expected: &Token) {
-        if expected == self.tokens.peek().expect("No token present to eat") {
+        let actual = self.tokens.peek().expect("No token present to eat");
+        println!("Actual was: {}", actual);
+        if expected == actual {
             self.tokens.next();
             //println!("Ate");
+        } else {
+            panic!("Received wrong token to eat, expected {}, but got {}", expected, actual);
         }
+
     }
 
     pub fn parse_program(&mut self) -> Result<Exp, ErrorType> {
@@ -138,6 +143,7 @@ impl Parser {
         Ok(left)
     }
 
+    // Maybe fun decls shouldn't be here - find out when testing later...
     fn primary_expr(&mut self) -> Result<Exp, ErrorType> {
         return match self.tokens.peek().unwrap() {
             Token::IntLit(v) => self.int_lit(),
@@ -148,10 +154,30 @@ impl Parser {
             Token::IF => self.if_expr(),
             Token::WHILE => self.while_expr(),
             Token::OpenParen => self.tuple_expr(),
+            Token::FUNDEC => self.fun_dec(),
             _ => Err("Test"),
         };
     }
 
+    fn fun_dec(&mut self) -> Result<Exp, ErrorType> {
+        self.eat(&Token::FUNDEC);
+        let name = self.identifier();
+        self.eat(&Token::OpenParen);
+        let mut arguments = vec![self.identifier()];
+
+        while let Token::COMMA = self.tokens.peek().unwrap() {
+            self.eat(&Token::COMMA);
+            arguments.push(self.identifier());
+        }
+
+        self.eat(&Token::CloseParen);
+        self.eat(&Token::EQUAL);
+        let body = self.expr()?;
+        Ok(Exp::FunDefExp(name, arguments, Box::new(body)))
+
+    }
+
+    // Allow arbitrary length?
     fn tuple_expr(&mut self) -> Result<Exp, ErrorType> {
         self.eat(&Token::OpenParen);
         let v1 = self.expr()?;
@@ -198,8 +224,6 @@ impl Parser {
 
     fn var_expr(&mut self) -> Result<Exp, ErrorType> {
         let id = self.identifier();
-        let id_temp = id.clone();
-        self.eat(&Token::Identifier(id_temp));
 
         return match self.tokens.peek() {
             Some(Token::EQUAL) => self.assign_expr(id),
@@ -235,7 +259,6 @@ impl Parser {
 
         let id = self.identifier();
 
-        self.eat(&Token::Identifier(id.clone())); //TODO: Handle in identifier case
         self.eat(&Token::EQUAL);
 
         let expr = self.expr().unwrap();
@@ -252,7 +275,10 @@ impl Parser {
                 panic!("Could not parse identifier");
             }
         };
-        id.to_string()
+        let id_temp = id.clone();
+        let id_temp2 = id.clone();
+        self.eat(&Token::Identifier(id_temp));
+        id_temp2
     }
 
     fn int_lit(&mut self) -> Result<Exp, ErrorType> {

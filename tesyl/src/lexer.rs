@@ -169,6 +169,7 @@ fn read_identifier(cur: char, iter: &mut Peekable<Chars>) -> Token {
         (String::from("true"), Token::TRUE),
         (String::from("false"), Token::FALSE),
         (String::from("while"), Token::WHILE),
+        (String::from("def"), Token::FUNDEC),
     ]);
 
     while (is_identifier_symbol(iter.peek())) {

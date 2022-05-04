@@ -1,9 +1,18 @@
 //Possible values of program execution
+
+
+use crate::Exp;
+use std::collections::HashMap;
+type Id = String;
+type VarEnv = HashMap<Id, Val>;
+type FunEnv = HashMap<Id, Val>;
+
 #[derive(PartialEq, Clone)]
 pub enum Val {
     IntVal(i32),
     BoolVal(bool),
     TupleVal(Box<Val>, Box<Val>),
+    ClosureVal(Vec<Id>, Box<Exp>, VarEnv, FunEnv),
     UnitVal,
 }
 

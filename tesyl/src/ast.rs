@@ -5,7 +5,7 @@ use std::fmt::{self};
 type Id = String;
 
 // Do we require ; after all exps? Or just for seqexps?
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Exp {
     BinOpExp(Box<Exp>, BinOp, Box<Exp>),
     IntExp(i32),
@@ -16,12 +16,13 @@ pub enum Exp {
     SeqExp(Vec<Exp>),
     IfExp(Box<Exp>, Box<Exp>, Box<Exp>),
     WhileExp(Box<Exp>, Box<Exp>),
+    FunDefExp(Id, Vec<Id>, Box<Exp>),
     UnitExp,
     TupleExp(Box<Exp>, Box<Exp>), // Vec of elements? In parser, comsume untill no more ','. For now just 2
                                   //Undefined,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum BinOp {
     PlusBinOp,
     MinusBinOp,
@@ -34,6 +35,7 @@ pub enum BinOp {
     LessThanBinOp,
     LessThenEqualBinOp,
 }
+
 
 /*pub fn bin_op_exp_from_token(token: &Token) -> BinOp {
     match token {
@@ -60,6 +62,7 @@ impl fmt::Display for Exp {
             Exp::WhileExp(guard, body) => write!(f, "WhileExp({}, {})", guard, body),
             Exp::UnitExp => write!(f, "UnitExp"),
             Exp::TupleExp(v1, v2) => write!(f, "TupleExp({}, {})", v1, v2),
+            Exp::FunDefExp(id, args, body) => write!(f, "FunDefExp({}, {:?}, {})", id, args, body)
             //Exp::Undefined => write!(f, "Undefined"),
             //_ => write!(f, "Not Implemented "),
         }
