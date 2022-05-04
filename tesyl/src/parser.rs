@@ -38,9 +38,11 @@ impl Parser {
             self.tokens.next();
             //println!("Ate");
         } else {
-            panic!("Received wrong token to eat, expected {}, but got {}", expected, actual);
+            panic!(
+                "Received wrong token to eat, expected {}, but got {}",
+                expected, actual
+            );
         }
-
     }
 
     pub fn parse_program(&mut self) -> Result<Exp, ErrorType> {
@@ -174,7 +176,6 @@ impl Parser {
         self.eat(&Token::EQUAL);
         let body = self.expr()?;
         Ok(Exp::FunDefExp(name, arguments, Box::new(body)))
-
     }
 
     // Allow arbitrary length?
@@ -251,8 +252,7 @@ impl Parser {
 
         self.eat(&Token::CloseParen);
 
-        Ok(Exp::CallExp(args))
-
+        Ok(Exp::CallExp(id, args))
     }
 
     fn assign_expr(&mut self, id: String) -> Result<Exp, ErrorType> {

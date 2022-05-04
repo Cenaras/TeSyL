@@ -20,7 +20,10 @@ impl Interpreter {
     pub fn new() -> Interpreter {
         let var_map: HashMap<Id, Val> = HashMap::new();
         let fun_map: HashMap<Id, Val> = HashMap::new();
-        Interpreter { var_env: var_map, fun_env: fun_map }
+        Interpreter {
+            var_env: var_map,
+            fun_env: fun_map,
+        }
     }
 
     // Default value is error
@@ -29,6 +32,14 @@ impl Interpreter {
         return match temp_map.remove(&key) {
             Some(val) => val,
             None => panic!("{} is not declared with a let", key),
+        };
+    }
+
+    fn get_closure(&mut self, key: Id) -> Val {
+        let mut tmp_map = self.fun_env.clone();
+        return match tmp_map.remove(&key) {
+            Some(cls) => cls,
+            None => panic!("{} is not a declared function", key),
         };
     }
 
@@ -48,7 +59,8 @@ impl Interpreter {
                     BinOp::PlusBinOp => match (left, right) {
                         (Val::IntVal(v1), Val::IntVal(v2)) => Val::IntVal(v1 + v2),
                         (Val::TupleVal(v1, v2), Val::TupleVal(v3, v4)) => {
-                            match (*v1, *v2, *v3, *v4) { // Only support for (a, b) + (c, b) for a, b, c, d being ints.
+                            match (*v1, *v2, *v3, *v4) {
+                                // Only support for (a, b) + (c, b) for a, b, c, d being ints.
                                 (
                                     Val::IntVal(val1),
                                     Val::IntVal(val2),
@@ -176,12 +188,17 @@ impl Interpreter {
                 let cur_var_env = self.var_env.clone();
                 let cur_fun_env = self.fun_env.clone();
                 let closure = Val::ClosureVal(args, body, cur_var_env, cur_fun_env);
-                
+
                 self.fun_env.insert(id, closure);
                 Val::UnitVal
             }
-            Exp::CallExp(args) => {
+            Exp::CallExp(id, args) => {
                 println!("CallExp not implemented - might need more params");
+                let closure = self.get_closure(id);
+                // TODO: Eval all args, maybe into a vec.
+                // Match the closure to ensure actual closure
+                // Eval body in closure envs, expanded with bindings from the args to their evaluated values...
+
                 Val::UnitVal
             }
             Exp::UnitExp => Val::UnitVal, //_ => Val::Undefined,

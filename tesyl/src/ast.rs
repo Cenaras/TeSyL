@@ -17,7 +17,7 @@ pub enum Exp {
     IfExp(Box<Exp>, Box<Exp>, Box<Exp>),
     WhileExp(Box<Exp>, Box<Exp>),
     FunDefExp(Id, Vec<Id>, Box<Exp>),
-    CallExp(Vec<Exp>),
+    CallExp(Id, Vec<Exp>),
     UnitExp,
     TupleExp(Box<Exp>, Box<Exp>), // Vec of elements? In parser, comsume untill no more ','. For now just 2
                                   //Undefined,
@@ -36,7 +36,6 @@ pub enum BinOp {
     LessThanBinOp,
     LessThenEqualBinOp,
 }
-
 
 /*pub fn bin_op_exp_from_token(token: &Token) -> BinOp {
     match token {
@@ -64,7 +63,7 @@ impl fmt::Display for Exp {
             Exp::UnitExp => write!(f, "UnitExp"),
             Exp::TupleExp(v1, v2) => write!(f, "TupleExp({}, {})", v1, v2),
             Exp::FunDefExp(id, args, body) => write!(f, "FunDefExp({}, {:?}, {})", id, args, body),
-            Exp::CallExp(args) => write!(f, "CallExp({:?})", args),
+            Exp::CallExp(id, args) => write!(f, "CallExp({}, {:?})", id, args),
             //Exp::Undefined => write!(f, "Undefined"),
             //_ => write!(f, "Not Implemented "),
         }
