@@ -180,6 +180,10 @@ impl Interpreter {
                 self.fun_env.insert(id, closure);
                 Val::UnitVal
             }
+            Exp::CallExp(args) => {
+                println!("CallExp not implemented - might need more params");
+                Val::UnitVal
+            }
             Exp::UnitExp => Val::UnitVal, //_ => Val::Undefined,
         };
     }

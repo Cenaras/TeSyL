@@ -227,8 +227,32 @@ impl Parser {
 
         return match self.tokens.peek() {
             Some(Token::EQUAL) => self.assign_expr(id),
+            Some(Token::OpenParen) => self.fun_call_args(id),
             _ => Ok(Exp::VarExp(id)),
         };
+    }
+
+    fn fun_call_args(&mut self, id: String) -> Result<Exp, ErrorType> {
+        self.eat(&Token::OpenParen);
+        let mut args = vec![];
+
+        // If we see ), end loop. Else keep reading expressions and eat comma. If token after argument is not comma anymore, eat ) and return CallExp
+        loop {
+            if (self.tokens.peek().unwrap() == &Token::CloseParen) {
+                break;
+            }
+
+            args.push(self.expr()?);
+            match self.tokens.peek().unwrap() {
+                Token::COMMA => self.eat(&Token::COMMA),
+                _ => break,
+            }
+        }
+
+        self.eat(&Token::CloseParen);
+
+        Ok(Exp::CallExp(args))
+
     }
 
     fn assign_expr(&mut self, id: String) -> Result<Exp, ErrorType> {

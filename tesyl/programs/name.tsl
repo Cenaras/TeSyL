@@ -1,5 +1,10 @@
-def hello(a, b) = {
-    let x = a;
-    let y = b;
-    (x, y)
+{
+    def hello(a, b) = {
+        let x = a;
+        let y = b;
+        (x, y)
+    };
+
+    hello(1, 2)
+
 }
