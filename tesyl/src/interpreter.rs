@@ -19,16 +19,7 @@ impl Interpreter {
         Interpreter {}
     }
 
-    // Default value is error
-    /*fn get_or_else(&mut self, key: Id) -> Val {
-        let mut temp_map = self.var_env.clone();
-        return match temp_map.remove(&key) {
-            Some(val) => val,
-            None => panic!("{} is not declared with a let", key),
-        };
-    }*/
-
-    fn get_closure(&mut self, key: Id, map: HashMap<Id, Val>) -> Val {
+    fn get_closure(&mut self, key: Id, map: FunEnv) -> Val {
         let mut tmp_map = map.clone();
         return match tmp_map.remove(&key) {
             Some(cls) => cls,
@@ -37,12 +28,7 @@ impl Interpreter {
     }
 
     // Potentially pass environments with eval.
-    pub fn eval(
-        &mut self,
-        e: Exp,
-        var_env: HashMap<Id, Val>,
-        fun_env: HashMap<Id, Val>,
-    ) -> (Val, HashMap<Id, Val>, HashMap<Id, Val>) {
+    pub fn eval(&mut self, e: Exp, var_env: VarEnv, fun_env: FunEnv) -> (Val, VarEnv, FunEnv) {
         // Debugging
         print_program(&e);
 
