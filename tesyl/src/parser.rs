@@ -215,7 +215,7 @@ impl Parser {
                 true
             }
             Token::FALSE => {
-                self.eat(&Token::TRUE);
+                self.eat(&Token::FALSE);
                 false
             }
             _ => panic!("Could not parse boolean expression"),

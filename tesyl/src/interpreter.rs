@@ -1,16 +1,17 @@
-use core::panic;
-use std::collections::HashMap;
-
 use crate::ast::BinOp;
 use crate::print_program;
 use crate::val::Val;
 use crate::Exp;
+use core::panic;
+use std::collections::HashMap;
+use std::iter::zip;
 
 // Map identifiers to their values
 type Id = String;
 type VarEnv = HashMap<Id, Val>;
 type FunEnv = HashMap<Id, Val>;
 
+// TODO: Determine if some sub expressions should actually update environments (e.g. for tuples and others...)
 pub struct Interpreter {
     var_env: VarEnv,
     fun_env: FunEnv,
@@ -44,21 +45,32 @@ impl Interpreter {
     }
 
     // Potentially pass environments with eval.
-    pub fn eval(&mut self, e: Exp) -> Val {
+    pub fn eval(
+        &mut self,
+        e: Exp,
+        var_env: HashMap<Id, Val>,
+        fun_env: HashMap<Id, Val>,
+    ) -> (Val, HashMap<Id, Val>, HashMap<Id, Val>) {
         // Debugging
         print_program(&e);
 
         // Match top level expression and recursively compute sub terms.
         return match e {
-            Exp::IntExp(v) => Val::IntVal(v),
-            Exp::BoolExp(b) => Val::BoolVal(b),
+            Exp::IntExp(v) => (Val::IntVal(v), var_env, fun_env),
+            Exp::BoolExp(b) => (Val::BoolVal(b), var_env, fun_env),
             Exp::BinOpExp(left, op, right) => {
-                let left = self.eval(*left);
-                let right = self.eval(*right);
+                let tmp_venv = var_env.clone();
+                let tmp_fenv = fun_env.clone();
+
+                let left = self.eval(*left, var_env, fun_env);
+
+                let right = self.eval(*right, tmp_venv, tmp_fenv);
                 match op {
                     BinOp::PlusBinOp => match (left, right) {
-                        (Val::IntVal(v1), Val::IntVal(v2)) => Val::IntVal(v1 + v2),
-                        (Val::TupleVal(v1, v2), Val::TupleVal(v3, v4)) => {
+                        ((Val::IntVal(v1), _, _), (Val::IntVal(v2), venv, fenv)) => {
+                            (Val::IntVal(v1 + v2), venv, fenv)
+                        }
+                        ((Val::TupleVal(v1, v2), _, _), (Val::TupleVal(v3, v4), venv, fenv)) => {
                             match (*v1, *v2, *v3, *v4) {
                                 // Only support for (a, b) + (c, b) for a, b, c, d being ints.
                                 (
@@ -66,9 +78,13 @@ impl Interpreter {
                                     Val::IntVal(val2),
                                     Val::IntVal(val3),
                                     Val::IntVal(val4),
-                                ) => Val::TupleVal(
-                                    Box::new(Val::IntVal(val1 + val3)),
-                                    Box::new(Val::IntVal(val2 + val4)),
+                                ) => (
+                                    Val::TupleVal(
+                                        Box::new(Val::IntVal(val1 + val3)),
+                                        Box::new(Val::IntVal(val2 + val4)),
+                                    ),
+                                    venv,
+                                    fenv,
                                 ),
                                 _ => panic!("Error"),
                             }
@@ -78,130 +94,213 @@ impl Interpreter {
                         }
                     },
                     BinOp::MinusBinOp => match (left, right) {
-                        (Val::IntVal(v1), Val::IntVal(v2)) => Val::IntVal(v1 - v2),
+                        ((Val::IntVal(v1), _, _), (Val::IntVal(v2), venv, fenv)) => {
+                            (Val::IntVal(v1 - v2), venv, fenv)
+                        }
                         _ => {
                             panic!("Expected two integers for minus")
                         }
                     },
                     BinOp::TimesBinOp => match (left, right) {
-                        (Val::IntVal(v1), Val::IntVal(v2)) => Val::IntVal(v1 * v2),
+                        ((Val::IntVal(v1), _, _), (Val::IntVal(v2), venv, fenv)) => {
+                            (Val::IntVal(v1 * v2), venv, fenv)
+                        }
                         _ => {
                             panic!("Expected two integers for multiplication")
                         }
                     },
                     BinOp::DivideBinOp => match (left, right) {
-                        (Val::IntVal(v1), Val::IntVal(v2)) => {
+                        ((Val::IntVal(v1), _, _), (Val::IntVal(v2), venv, fenv)) => {
                             if (v2 == 0) {
                                 panic!("Division by 0 error")
                             }
-                            Val::IntVal(v1 / v2)
+                            (Val::IntVal(v1 / v2), venv, fenv)
                         }
                         _ => {
                             panic!("Expected two integers for division")
                         }
                     },
                     BinOp::EqualBinOp => match (left, right) {
-                        (Val::IntVal(v1), Val::IntVal(v2)) => Val::BoolVal(v1 == v2),
-                        (Val::BoolVal(v1), Val::BoolVal(v2)) => Val::BoolVal(v1 == v2),
+                        ((Val::IntVal(v1), _, _), (Val::IntVal(v2), venv, fenv)) => {
+                            (Val::BoolVal(v1 == v2), venv, fenv)
+                        }
+                        ((Val::BoolVal(v1), _, _), (Val::BoolVal(v2), venv, fenv)) => {
+                            (Val::BoolVal(v1 == v2), venv, fenv)
+                        }
                         _ => panic!("Incomparable types used for boolean equality"),
                     },
                     BinOp::NotEqualBinOp => match (left, right) {
-                        (Val::IntVal(v1), Val::IntVal(v2)) => Val::BoolVal(v1 != v2),
-                        (Val::BoolVal(v1), Val::BoolVal(v2)) => Val::BoolVal(v1 != v2),
+                        ((Val::IntVal(v1), _, _), (Val::IntVal(v2), venv, fenv)) => {
+                            (Val::BoolVal(v1 != v2), venv, fenv)
+                        }
+                        ((Val::BoolVal(v1), _, _), (Val::BoolVal(v2), venv, fenv)) => {
+                            (Val::BoolVal(v1 != v2), venv, fenv)
+                        }
                         _ => panic!("Incomparable types used for boolean equality"),
                     },
                     BinOp::GreaterThanBinOp => match (left, right) {
-                        (Val::IntVal(v1), Val::IntVal(v2)) => Val::BoolVal(v1 > v2),
+                        ((Val::IntVal(v1), _, _), (Val::IntVal(v2), venv, fenv)) => {
+                            (Val::BoolVal(v1 > v2), venv, fenv)
+                        }
                         _ => panic!("Incomparable types used for boolean comparision >"),
                     },
                     BinOp::GreaterThanEqualBinOp => match (left, right) {
-                        (Val::IntVal(v1), Val::IntVal(v2)) => Val::BoolVal(v1 >= v2),
+                        ((Val::IntVal(v1), _, _), (Val::IntVal(v2), venv, fenv)) => {
+                            (Val::BoolVal(v1 >= v2), venv, fenv)
+                        }
                         _ => panic!("Incomparable types used for boolean comparision >="),
                     },
                     BinOp::LessThanBinOp => match (left, right) {
-                        (Val::IntVal(v1), Val::IntVal(v2)) => Val::BoolVal(v1 < v2),
+                        ((Val::IntVal(v1), _, _), (Val::IntVal(v2), venv, fenv)) => {
+                            (Val::BoolVal(v1 < v2), venv, fenv)
+                        }
                         _ => panic!("Incomparable types used for boolean comparision <"),
                     },
                     BinOp::LessThenEqualBinOp => match (left, right) {
-                        (Val::IntVal(v1), Val::IntVal(v2)) => Val::BoolVal(v1 <= v2),
+                        ((Val::IntVal(v1), _, _), (Val::IntVal(v2), venv, fenv)) => {
+                            (Val::BoolVal(v1 < v2), venv, fenv)
+                        }
                         _ => panic!("Incomparable types used for boolean comparision <="),
                     },
                 }
             }
             // Update environment. LetExp returns Unit
             Exp::LetExp(id, exp) => {
-                let val = self.eval(*exp);
-                self.var_env.insert(id, val);
-                Val::UnitVal
+                let mut local_venv = var_env.clone();
+                let (val, venv, fenv) = self.eval(*exp, var_env, fun_env);
+                local_venv.insert(id, val);
+                //self.var_env.insert(id, val);
+                (Val::UnitVal, local_venv, fenv)
             }
             Exp::AssignmentExp(id, expr) => {
                 // Check if defined.
                 let temp_id = id.clone();
-                self.get_or_else(temp_id);
-                let val = self.eval(*expr);
-                self.var_env.insert(id, val);
-                Val::UnitVal
+                let mut local_venv = var_env.clone();
+                //self.get_or_else(temp_id);
+                if (var_env.get(&id) == None) {
+                    panic!("Variable not defined with let binding")
+                }
+                let (val, venv, fenv) = self.eval(*expr, var_env, fun_env);
+                //self.var_env.insert(id, val);
+                local_venv.insert(id, val);
+                (Val::UnitVal, local_venv, fenv)
             }
             // Require defined variaible or throw error.
-            Exp::VarExp(id) => self.get_or_else(id),
+            Exp::VarExp(id) => {
+                let mut temp_env = var_env.clone();
+                let val = temp_env.remove(&id).unwrap();
+                (val, var_env, fun_env)
+            }
             Exp::SeqExp(expressions) => {
-                let mut result = Val::UnitVal; // If empty, return unit
+                let mut loc_venv = var_env.clone();
+                let mut loc_fenv = fun_env.clone();
+                let mut result = Val::UnitVal;
+
+                for expr in expressions {
+                    let (res, venv, fenv) = self.eval(expr, loc_venv, loc_fenv);
+                    result = res;
+                    loc_venv = venv;
+                    loc_fenv = fenv;
+                }
+
+                /*let mut result = (Val::UnitVal, var_env, fun_env); // If empty, return unit
                 for expr in expressions {
                     result = self.eval(expr); // eval each expression, possibly updating the environment. Potential optimizer to only save last...
-                }
-                return result;
+                }*/
+
+                return (result, loc_venv, loc_fenv);
             }
             Exp::IfExp(g, thn, els) => {
-                let guard = self.eval(*g);
+                let (guard, venv, fenv) = self.eval(*g, var_env, fun_env);
                 let val = match guard {
                     Val::BoolVal(b) => b,
                     _ => panic!("Expected guard to be a boolean value for if statement"),
                 };
                 // Return the expression in the appropiate branch
                 return if val {
-                    self.eval(*thn)
+                    self.eval(*thn, venv, fenv)
                 } else {
-                    self.eval(*els)
+                    self.eval(*els, venv, fenv)
                 };
             }
             // If false, return unit. Else eval body and eval while again. Need temps to satisfy safety
             Exp::WhileExp(ref g, ref b) => {
                 let temp_guard = g.clone();
-                let guard = self.eval(*temp_guard);
+                let (guard, venv, fenv) = self.eval(*temp_guard, var_env, fun_env);
                 match guard {
-                    Val::BoolVal(false) => return Val::UnitVal,
+                    Val::BoolVal(false) => return (Val::UnitVal, venv, fenv),
                     Val::BoolVal(true) => {
                         let temp_body = b.clone();
-                        let body = self.eval(*temp_body);
-                        self.eval(e)
+                        let (body, venv1, fenv1) = self.eval(*temp_body, venv, fenv);
+                        self.eval(e, venv1, fenv1)
                     }
                     _ => panic!("Expected guard to be a boolean value for while loop"),
                 }
             }
             // TODO: TupleAccess expression
             Exp::TupleExp(v1, v2) => {
-                let first = self.eval(*v1);
-                let second = self.eval(*v2);
-                Val::TupleVal(Box::new(first), Box::new(second))
+                let (first, v1, f1) = self.eval(*v1, var_env, fun_env);
+                let (second, v2, f2) = self.eval(*v2, v1, f1);
+                ((Val::TupleVal(Box::new(first), Box::new(second)), v2, f2))
             }
             Exp::FunDefExp(id, args, body) => {
                 let cur_var_env = self.var_env.clone();
                 let cur_fun_env = self.fun_env.clone();
+                let mut fenv = cur_fun_env.clone();
                 let closure = Val::ClosureVal(args, body, cur_var_env, cur_fun_env);
 
-                self.fun_env.insert(id, closure);
-                Val::UnitVal
-            }
-            Exp::CallExp(id, args) => {
-                println!("CallExp not implemented - might need more params");
-                let closure = self.get_closure(id);
-                // TODO: Eval all args, maybe into a vec.
-                // Match the closure to ensure actual closure
-                // Eval body in closure envs, expanded with bindings from the args to their evaluated values...
+                //self.fun_env.insert(id, closure);
 
-                Val::UnitVal
+                fenv.insert(id, closure);
+
+                (Val::UnitVal, var_env, fenv)
             }
-            Exp::UnitExp => Val::UnitVal, //_ => Val::Undefined,
+            Exp::CallExp(fun_id, args) => {
+                let tmp_fun_id = fun_id.clone();
+
+                let closure = match self.get_closure(tmp_fun_id) {
+                    Val::ClosureVal(params, body, var_env, fun_env) => {
+                        (params, body, var_env, fun_env)
+                    }
+                    _ => panic!("Not a closure value"),
+                };
+
+                if (args.len() != closure.0.len()) {
+                    panic!("Incompatible length of arguments")
+                }
+                // Eval all args and reverse list to retin order
+                let mut eval_args: Vec<Val> = vec![];
+
+                for arg in args {
+                    let venv = var_env.clone();
+                    let fenv = fun_env.clone();
+                    let (e, venv, fenv) = self.eval(arg, venv, fenv);
+                    eval_args.push(e);
+                }
+                eval_args.reverse();
+
+                // Make local copies of environments
+                let mut loc_var_env = self.var_env.clone();
+                let mut loc_fun_env = self.fun_env.clone();
+
+                let fun_params = closure.0.clone();
+
+                // Update local vars with new bindings from params to eval'd exps.
+                for (param_id, arg) in zip(fun_params, eval_args) {
+                    loc_var_env.insert(param_id, arg);
+                }
+
+                let body = closure.1.clone();
+
+                loc_fun_env.insert(
+                    fun_id,
+                    Val::ClosureVal(closure.0, closure.1, closure.2, closure.3),
+                );
+
+                // Add environments to eval function, to give new envs to this...
+                return self.eval(*body, loc_var_env, loc_fun_env);
+            }
+            Exp::UnitExp => (Val::UnitVal, var_env, fun_env), //_ => Val::Undefined,
         };
     }
 }
