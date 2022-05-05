@@ -6,7 +6,7 @@ type Id = String;
 type VarEnv = HashMap<Id, Val>;
 type FunEnv = HashMap<Id, Val>;
 
-#[derive(PartialEq, Clone)]
+#[derive(PartialEq, Clone, Debug)]
 pub enum Val {
     IntVal(i32),
     BoolVal(bool),

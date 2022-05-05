@@ -12,32 +12,24 @@ type VarEnv = HashMap<Id, Val>;
 type FunEnv = HashMap<Id, Val>;
 
 // TODO: Determine if some sub expressions should actually update environments (e.g. for tuples and others...)
-pub struct Interpreter {
-    var_env: VarEnv,
-    fun_env: FunEnv,
-}
+pub struct Interpreter {}
 
 impl Interpreter {
     pub fn new() -> Interpreter {
-        let var_map: HashMap<Id, Val> = HashMap::new();
-        let fun_map: HashMap<Id, Val> = HashMap::new();
-        Interpreter {
-            var_env: var_map,
-            fun_env: fun_map,
-        }
+        Interpreter {}
     }
 
     // Default value is error
-    fn get_or_else(&mut self, key: Id) -> Val {
+    /*fn get_or_else(&mut self, key: Id) -> Val {
         let mut temp_map = self.var_env.clone();
         return match temp_map.remove(&key) {
             Some(val) => val,
             None => panic!("{} is not declared with a let", key),
         };
-    }
+    }*/
 
-    fn get_closure(&mut self, key: Id) -> Val {
-        let mut tmp_map = self.fun_env.clone();
+    fn get_closure(&mut self, key: Id, map: HashMap<Id, Val>) -> Val {
+        let mut tmp_map = map.clone();
         return match tmp_map.remove(&key) {
             Some(cls) => cls,
             None => panic!("{} is not a declared function", key),
@@ -244,8 +236,8 @@ impl Interpreter {
                 ((Val::TupleVal(Box::new(first), Box::new(second)), v2, f2))
             }
             Exp::FunDefExp(id, args, body) => {
-                let cur_var_env = self.var_env.clone();
-                let cur_fun_env = self.fun_env.clone();
+                let cur_var_env = var_env.clone();
+                let cur_fun_env = fun_env.clone();
                 let mut fenv = cur_fun_env.clone();
                 let closure = Val::ClosureVal(args, body, cur_var_env, cur_fun_env);
 
@@ -257,8 +249,11 @@ impl Interpreter {
             }
             Exp::CallExp(fun_id, args) => {
                 let tmp_fun_id = fun_id.clone();
+                let tmp_fenv = fun_env.clone();
+                println!("Current fun environment is: {:?}", fun_env);
+                println!("tmp_fun_id: {}", tmp_fun_id);
 
-                let closure = match self.get_closure(tmp_fun_id) {
+                let closure = match self.get_closure(tmp_fun_id, tmp_fenv) {
                     Val::ClosureVal(params, body, var_env, fun_env) => {
                         (params, body, var_env, fun_env)
                     }
@@ -280,8 +275,8 @@ impl Interpreter {
                 eval_args.reverse();
 
                 // Make local copies of environments
-                let mut loc_var_env = self.var_env.clone();
-                let mut loc_fun_env = self.fun_env.clone();
+                let mut loc_var_env = var_env.clone();
+                let mut loc_fun_env = fun_env.clone();
 
                 let fun_params = closure.0.clone();
 
