@@ -1,11 +1,17 @@
-While, Function Def, Function Call, ...
 Wrap Guards in () at parser?
 Increment assignments
 Unary expressions - minus and negate
+Better tests of complex programs
+
+
 Real tests - fib with while loop, function call when ready.
-Proper error messages.
+
+
 Tuple values - allow pair-wise computations for BinOps.
 
 Add Operational Semantics document, and keep up to date.
 Benchmark tests - Ackermann number.
 Refactor and optimize code - use more rust built-in features.
+
+Fix issue with Equals check: if (m = 0) parsed as IfExp(AssignExp) - maybe make == ?
+

@@ -1,0 +1,8 @@
+{
+    def ack(m, n) = {
+        if m = 0 then n + 1 else 2
+    };
+
+    ack(1, 2)
+
+}
