@@ -65,8 +65,8 @@ impl Parser {
         let mut left = self.additive_expr()?;
         loop {
             let op = match self.tokens.peek() {
-                Some(Token::EQUAL) => {
-                    self.eat(&Token::EQUAL);
+                Some(Token::EQEQ) => {
+                    self.eat(&Token::EQEQ);
                     BinOp::EqualBinOp
                 }
                 Some(Token::NEQ) => {

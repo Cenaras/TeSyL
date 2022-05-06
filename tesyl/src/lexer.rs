@@ -99,7 +99,13 @@ fn get_token(iter: &mut Peekable<Chars>) -> Token {
                         _ => return Token::LE,
                     }
                 }
-                '=' => Token::EQUAL,
+                '=' => match iter.peek() {
+                    Some('=') => {
+                        iter.next();
+                        return Token::EQEQ;
+                    }
+                    _ => return Token::EQUAL,
+                },
                 '!' => {
                     match iter.peek() {
                         Some('=') => {

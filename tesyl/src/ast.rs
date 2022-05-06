@@ -77,7 +77,7 @@ impl fmt::Display for BinOp {
             BinOp::MinusBinOp => write!(f, "-"),
             BinOp::TimesBinOp => write!(f, "*"),
             BinOp::DivideBinOp => write!(f, "/"),
-            BinOp::EqualBinOp => write!(f, "="),
+            BinOp::EqualBinOp => write!(f, "=="),
             BinOp::NotEqualBinOp => write!(f, "!="),
             BinOp::GreaterThanBinOp => write!(f, ">"),
             BinOp::GreaterThanEqualBinOp => write!(f, ">="),
