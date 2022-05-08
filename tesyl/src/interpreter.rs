@@ -30,7 +30,7 @@ impl Interpreter {
     // Potentially pass environments with eval.
     pub fn eval(&mut self, e: Exp, var_env: VarEnv, fun_env: FunEnv) -> (Val, VarEnv, FunEnv) {
         // Debugging
-        print_program(&e);
+        //print_program(&e);
 
         // Match top level expression and recursively compute sub terms.
         return match e {
@@ -136,7 +136,7 @@ impl Interpreter {
                     },
                     BinOp::LessThenEqualBinOp => match (left, right) {
                         ((Val::IntVal(v1), _, _), (Val::IntVal(v2), venv, fenv)) => {
-                            (Val::BoolVal(v1 < v2), venv, fenv)
+                            (Val::BoolVal(v1 <= v2), venv, fenv)
                         }
                         _ => panic!("Incomparable types used for boolean comparision <="),
                     },
@@ -189,7 +189,12 @@ impl Interpreter {
                 return (result, loc_venv, loc_fenv);
             }
             Exp::IfExp(g, thn, els) => {
+                println!("In If Statement: Values are:\n Guard: {},\n Then: {},\n Else: {},\n", g, thn, els);
+
+                println!("Got to the if, with var env {:?}\n", var_env);
+                // This gets false, i.e. n <= 1 gets false, even though n --> 1. Error in BinOp for <=?
                 let (guard, venv, fenv) = self.eval(*g, var_env, fun_env);
+                println!("Guard: {},\n venv: {:?},\nfenv: {:?}", guard, venv, fenv);
                 let val = match guard {
                     Val::BoolVal(b) => b,
                     _ => panic!("Expected guard to be a boolean value for if statement"),
@@ -236,8 +241,7 @@ impl Interpreter {
             Exp::CallExp(fun_id, args) => {
                 let tmp_fun_id = fun_id.clone();
                 let tmp_fenv = fun_env.clone();
-                println!("Current fun environment is: {:?}", fun_env);
-                println!("tmp_fun_id: {}", tmp_fun_id);
+                println!("Current fun environment is: {:?}\n", fun_env);
 
                 let closure = match self.get_closure(tmp_fun_id, tmp_fenv) {
                     Val::ClosureVal(params, body, var_env, fun_env) => {
@@ -251,14 +255,17 @@ impl Interpreter {
                 }
                 // Eval all args and reverse list to retin order
                 let mut eval_args: Vec<Val> = vec![];
-
+                
                 for arg in args {
                     let venv = var_env.clone();
                     let fenv = fun_env.clone();
+                    // Dies here
                     let (e, venv, fenv) = self.eval(arg, venv, fenv);
                     eval_args.push(e);
                 }
                 eval_args.reverse();
+                println!("Evaluated arguments in function call: \n{:?}", eval_args);
+
 
                 // Make local copies of environments
                 let mut loc_var_env = var_env.clone();
@@ -278,8 +285,17 @@ impl Interpreter {
                     Val::ClosureVal(closure.0, closure.1, closure.2, closure.3),
                 );
 
+                println!("Current bindinds in environments are {:?}\n{:?}\n", loc_var_env, loc_fun_env);
+
                 // Add environments to eval function, to give new envs to this...
+                println!("Evaluating the body: \n{}\n", body);
                 return self.eval(*body, loc_var_env, loc_fun_env);
+
+
+                // Stuff breaks for fibrec because the recursive call updates the "global n"
+                // Fixed above - works for fib 9, but fib 10 gives stack overflow. Maybe too many clones...
+                // Look into reducing clones - or maybe read on clone to see if it pushes to stack..
+
             }
             Exp::UnitExp => (Val::UnitVal, var_env, fun_env), //_ => Val::Undefined,
         };
