@@ -274,10 +274,6 @@ impl Interpreter {
                 eval_args.reverse();
                 println!("Evaluated arguments in function call: \n{:?}", eval_args);
 
-                // Make local copies of environments
-                //let mut loc_var_env = var_env.clone();
-                //let mut loc_fun_env = fun_env.clone();
-
                 let fun_params = closure.0.clone();
 
                 // Update local vars with new bindings from params to eval'd exps.
