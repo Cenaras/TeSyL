@@ -6,6 +6,9 @@ use core::panic;
 use std::collections::HashMap;
 use std::iter::zip;
 
+// https://stopa.io/post/222
+// Probably need environments as references instead to reduce stack
+
 // Map identifiers to their values
 type Id = String;
 type VarEnv = HashMap<Id, Val>;
