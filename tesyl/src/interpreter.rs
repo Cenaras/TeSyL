@@ -6,12 +6,6 @@ use core::panic;
 use std::collections::HashMap;
 use std::iter::zip;
 
-/*
-    This MR: Try and restart on the interpreter, and make the struct own the maps, and
-    avoid cloning so much. Hopefully that fixes memory issues
- */
-
-
 // https://stopa.io/post/222
 // Probably need environments as references instead to reduce stack
 

@@ -1,5 +1,7 @@
 #![allow(unused_parens)]
 #![allow(unused_variables)]
+extern crate core;
+
 mod tokens;
 mod val;
 
@@ -19,6 +21,9 @@ mod ast;
 use ast::*;
 
 mod interpreter;
+mod new_int;
+
+use crate::new_int::InterpreterNew;
 use interpreter::Interpreter;
 
 // Path is from current terminal path. Call from root of project
@@ -39,7 +44,22 @@ fn real_test(file: String) {
     );
     println!("Program terminated with result: \n{}\n", result.0);
 }
+
 fn main() {
+    // TODO: Remove me once interpreter is fixed
+    let mut args = std::env::args().skip(1);
+    let file = args.next().unwrap();
+
+    let program = Parser::new(Lexer::real(file).unwrap().lex())
+        .parse_program()
+        .unwrap();
+
+    let mut interpreter = InterpreterNew::new();
+    let result = interpreter.eval(program);
+    println!("Program terminated with result: \n{}\n", result);
+}
+
+fn main_fix() {
     // Mutable, since the iterator updates the state after each .next call
     let mut args = std::env::args().skip(1);
     let filename = args.next().expect("No file was specified");
