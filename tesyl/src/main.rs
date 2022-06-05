@@ -56,7 +56,8 @@ fn main() {
 
     let mut interpreter = InterpreterNew::new();
     let mut init_venv: HashMap<Id, Val> = HashMap::new();
-    let result = interpreter.eval(program, &mut init_venv);
+    let mut init_fenv: HashMap<Id, Val> = HashMap::new();
+    let result = interpreter.eval(program, &mut init_venv, &mut init_fenv);
     println!("Program terminated with result: \n{}\n", result);
 }
 
