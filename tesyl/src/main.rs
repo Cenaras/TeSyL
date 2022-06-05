@@ -21,10 +21,8 @@ mod ast;
 use ast::*;
 
 mod interpreter;
-mod new_int;
 
-use crate::new_int::InterpreterNew;
-use interpreter::Interpreter;
+use crate::interpreter::Interpreter;
 
 // Path is from current terminal path. Call from root of project
 
@@ -32,17 +30,17 @@ type Id = String;
 
 fn real_test(file: String) {
     assert_correct_format(&file);
-    let init_venv: HashMap<Id, Val> = HashMap::new();
-    let init_venf: HashMap<Id, Val> = HashMap::new();
+    let mut init_venv: HashMap<Id, Val> = HashMap::new();
+    let mut init_venf: HashMap<Id, Val> = HashMap::new();
     let mut interpreter = Interpreter::new();
     let result = interpreter.eval(
         Parser::new(Lexer::real(file).unwrap().lex())
             .parse_program()
             .unwrap(),
-        init_venv,
-        init_venf,
+        &mut init_venv,
+        &mut init_venf,
     );
-    println!("Program terminated with result: \n{}\n", result.0);
+    println!("Program terminated with result: \n{}\n", result);
 }
 
 fn main2() {
@@ -54,7 +52,7 @@ fn main2() {
         .parse_program()
         .unwrap();
 
-    let mut interpreter = InterpreterNew::new();
+    let mut interpreter = Interpreter::new();
     let mut init_venv: HashMap<Id, Val> = HashMap::new();
     let mut init_fenv: HashMap<Id, Val> = HashMap::new();
     let result = interpreter.eval(program, &mut init_venv, &mut init_fenv);
@@ -87,13 +85,13 @@ fn main() {
     let program = parser.parse_program();
     let test_program = program.clone();
 
-    let init_venv: HashMap<Id, Val> = HashMap::new();
-    let init_fenv: HashMap<Id, Val> = HashMap::new();
+    let mut init_venv: HashMap<Id, Val> = HashMap::new();
+    let mut init_fenv: HashMap<Id, Val> = HashMap::new();
 
     let mut interpreter = Interpreter::new();
-    let result = interpreter.eval(program.unwrap(), init_venv, init_fenv);
+    let result = interpreter.eval(program.unwrap(), &mut init_venv, &mut init_fenv);
 
-    println!("Program terminated with result: \n{}", result.0);
+    println!("Program terminated with result: \n{}", result);
 
     // ##### TEST PROGRAMS IF SPECIFIED #####
     // ToDo: Add --all support to test every sample file.
@@ -126,7 +124,7 @@ fn main() {
                 if (run_all) {
                     test_all_int();
                 } else {
-                    test_int(test_filename, result.0, false)
+                    test_int(test_filename, result, false)
                 }
             }
             _ => panic!("Test type not supported; only -lex, -par and -int are supported"),
@@ -175,17 +173,17 @@ fn test_all_int() {
             .to_string();
         let temp_file = filename.clone();
 
-        let init_venv: HashMap<Id, Val> = HashMap::new();
-        let init_fenv: HashMap<Id, Val> = HashMap::new();
+        let mut init_venv: HashMap<Id, Val> = HashMap::new();
+        let mut init_fenv: HashMap<Id, Val> = HashMap::new();
 
         let val = Interpreter::new().eval(
             Parser::new(Lexer::new(temp_file).unwrap().lex())
                 .parse_program()
                 .unwrap(),
-            init_venv,
-            init_fenv,
+            &mut init_venv,
+            &mut init_fenv,
         );
-        test_int(filename, val.0, false)
+        test_int(filename, val, false)
     }
     println!("All tests for interpreter successful!");
 }
