@@ -39,6 +39,29 @@ impl InterpreterNew {
                         (IntVal(v1), (IntVal(v2))) => IntVal(v1 - v2),
                         _ => panic!("Expect ints"),
                     },
+                    BinOp::TimesBinOp => match (left, right) {
+                        (IntVal(v1), (IntVal(v2))) => IntVal(v1 * v2),
+                        _ => panic!("Expect ints"),
+                    },
+                    BinOp::DivideBinOp => match (left, right) {
+                        (IntVal(v1), (IntVal(v2))) => {
+                            if v2 == 0 {
+                                panic!("Div by 0");
+                            }
+                            IntVal(v1 / v2)
+                        }
+                        _ => panic!("Expect ints"),
+                    },
+                    BinOp::EqualBinOp => match (left, right) {
+                        (IntVal(v1), (IntVal(v2))) => BoolVal(v1 == v2),
+                        (BoolVal(b1), BoolVal(b2)) => BoolVal(b1 == b2),
+                        _ => panic!("Expect ints"),
+                    },
+                    BinOp::NotEqualBinOp => match (left, right) {
+                        (IntVal(v1), (IntVal(v2))) => BoolVal(v1 != v2),
+                        (BoolVal(b1), BoolVal(b2)) => BoolVal(b1 != b2),
+                        _ => panic!("Expect ints"),
+                    },
                     BinOp::LessThanBinOp => match (left, right) {
                         (IntVal(v1), IntVal(v2)) => BoolVal(v1 < v2),
                         _ => panic!("Incomparable types used for boolean comparison <"),
@@ -47,7 +70,14 @@ impl InterpreterNew {
                         (IntVal(v1), IntVal(v2)) => BoolVal(v1 <= v2),
                         _ => panic!("Incomparable types used for boolean comparison <="),
                     },
-
+                    BinOp::GreaterThanBinOp => match (left, right) {
+                        (IntVal(v1), IntVal(v2)) => BoolVal(v1 > v2),
+                        _ => panic!("Incomparable types used for boolean comparison >"),
+                    },
+                    BinOp::GreaterThanEqualBinOp => match (left, right) {
+                        (IntVal(v1), IntVal(v2)) => BoolVal(v1 >= v2),
+                        _ => panic!("Incomparable types used for boolean comparison >="),
+                    },
                     _ => panic!("Not implemented"),
                 }
             }
@@ -86,6 +116,11 @@ impl InterpreterNew {
                 } else {
                     self.eval(*els, var_env, fun_env)
                 };
+            }
+            Exp::TupleExp(v1, v2) => {
+                let first = self.eval(*v1, var_env, fun_env);
+                let second = self.eval(*v2, var_env, fun_env);
+                Val::TupleVal(Box::new(first), Box::new(second))
             }
 
             // TODO: Might wanna look into this mess
@@ -150,7 +185,7 @@ impl InterpreterNew {
                 let res = self.eval(*body, &mut loc_venv, &mut loc_fenv);
                 res
             }
-
+            Exp::UnitExp => Val::UnitVal,
             _ => Val::UnitVal,
         }
     }

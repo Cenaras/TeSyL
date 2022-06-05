@@ -45,7 +45,7 @@ fn real_test(file: String) {
     println!("Program terminated with result: \n{}\n", result.0);
 }
 
-fn main() {
+fn main2() {
     // TODO: Remove me once interpreter is fixed
     let mut args = std::env::args().skip(1);
     let file = args.next().unwrap();
@@ -61,7 +61,7 @@ fn main() {
     println!("Program terminated with result: \n{}\n", result);
 }
 
-fn main_fix() {
+fn main() {
     // Mutable, since the iterator updates the state after each .next call
     let mut args = std::env::args().skip(1);
     let filename = args.next().expect("No file was specified");
