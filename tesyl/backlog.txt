@@ -13,5 +13,3 @@ Add Operational Semantics document, and keep up to date.
 Benchmark tests - Ackermann number.
 Refactor and optimize code - use more rust built-in features.
 
-Fix issue with Equals check: if (m = 0) parsed as IfExp(AssignExp) - maybe make == ?
-

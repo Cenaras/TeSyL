@@ -60,8 +60,8 @@ will first run the lexing, and compare the result with the file in */expected/le
 One can also choose to run all tests of a given type. For now, this still requires specifying a specific file, but every file will be ran. 
 **EXAMPLE**
 ```
-cargo run arith-tsl --test -lex --all
-cargo run arith-tsl --test -par --all
-cargo run arith-tsl --test -int --all
+cargo run arith.tsl --test -lex --all
+cargo run arith.tsl --test -par --all
+cargo run arith.tsl --test -int --all
 ```
 will run all samples files and compare them against their expected in the */lexing* directory, and likewise for parsing and interpretation.
