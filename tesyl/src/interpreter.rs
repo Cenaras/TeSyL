@@ -17,11 +17,13 @@ type Id = String;
 type VarEnv = HashMap<Id, Val>;
 type FunEnv = HashMap<Id, Val>;
 
-pub struct Interpreter {}
+pub struct Interpreter {
+    pub depth: u32,
+}
 
 impl Interpreter {
     pub fn new() -> Interpreter {
-        Interpreter {}
+        Interpreter {depth: 0}
     }
 
     pub fn eval(&mut self, e: Exp, var_env: &mut VarEnv, fun_env: &mut FunEnv) -> Val {
@@ -161,6 +163,8 @@ impl Interpreter {
                     _ => panic!("Error"),
                 };
 
+                self.depth += 1;
+
                 if args.len() != closure.ids.len() {
                     panic!("Error")
                 }
@@ -188,6 +192,9 @@ impl Interpreter {
                 println!("Evaluating body \n{}\n\n", *body);
                 println!("Environments: \n{:?}\n\n", loc_venv);
                 println!("Environments: \n{:?}\n\n", loc_fenv);
+                println!("Depth is: {}", self.depth);
+                // Still think that for some reason, too many recursive calls happen
+
                 self.eval(*body, &mut loc_venv, &mut loc_fenv)
             }
             Exp::UnitExp => Val::UnitVal,
