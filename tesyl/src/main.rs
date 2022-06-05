@@ -43,29 +43,13 @@ fn real_test(file: String) {
     println!("Program terminated with result: \n{}\n", result);
 }
 
-fn main2() {
-    // TODO: Remove me once interpreter is fixed
-    let mut args = std::env::args().skip(1);
-    let file = args.next().unwrap();
-
-    let program = Parser::new(Lexer::real(file).unwrap().lex())
-        .parse_program()
-        .unwrap();
-
-    let mut interpreter = Interpreter::new();
-    let mut init_venv: HashMap<Id, Val> = HashMap::new();
-    let mut init_fenv: HashMap<Id, Val> = HashMap::new();
-    let result = interpreter.eval(program, &mut init_venv, &mut init_fenv);
-    println!("Program terminated with result: \n{}\n", result);
-}
-
 fn main() {
     // Mutable, since the iterator updates the state after each .next call
     let mut args = std::env::args().skip(1);
     let filename = args.next().expect("No file was specified");
     let test_filename = filename.clone();
 
-    if (filename == "--run") {
+    if filename == "--run" {
         let file = args.next().expect("No file specified");
         real_test(file);
         return;

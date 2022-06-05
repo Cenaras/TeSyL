@@ -1,8 +1,9 @@
-use crate::Val::{BoolVal, IntVal};
+use crate::Val::{BoolVal, ClosureVal, IntVal};
 use crate::{BinOp, Exp, Val};
 use std::collections::HashMap;
 use std::env::var;
 use std::iter::zip;
+use crate::val::Closure;
 
 /*
    This MR: Try and restart on the interpreter, and make the struct own the maps, and
@@ -140,7 +141,14 @@ impl Interpreter {
             Exp::FunDefExp(id, args, body) => {
                 let cur_venv = var_env.clone();
                 let cur_fenv = fun_env.clone();
-                let closure = Val::ClosureVal(args, body, cur_venv, cur_fenv);
+                let cls = Closure {
+                    ids: args,
+                    body: body,
+                    venv: cur_venv,
+                    fenv: cur_fenv,
+                };
+
+                let closure = ClosureVal(cls);
                 fun_env.insert(id, closure);
                 Val::UnitVal
             }
@@ -149,11 +157,11 @@ impl Interpreter {
             Exp::CallExp(fun_id, args) => {
                 let tmp_fenv = fun_env.clone();
                 let closure = match tmp_fenv.get(&fun_id).unwrap() {
-                    Val::ClosureVal(params, body, venv, fenv) => (params, body, venv, fenv),
+                    ClosureVal(cls) => cls,
                     _ => panic!("Error"),
                 };
 
-                if args.len() != closure.0.len() {
+                if args.len() != closure.ids.len() {
                     panic!("Error")
                 }
                 let mut eval_args: Vec<Val> = vec![];
@@ -163,7 +171,7 @@ impl Interpreter {
                 }
                 eval_args.reverse();
 
-                let fun_params = closure.0.clone();
+                let fun_params = closure.ids.clone();
                 let mut loc_venv = var_env.clone();
                 let mut loc_fenv = fun_env.clone();
 
@@ -171,19 +179,16 @@ impl Interpreter {
                 for (param_id, arg) in zip(fun_params, eval_args) {
                     loc_venv.insert(param_id, arg);
                 }
-                let body = closure.1.clone();
+                let body = closure.body.clone();
                 loc_fenv.insert(
                     fun_id,
-                    Val::ClosureVal(
-                        closure.0.clone(),
-                        closure.1.clone(),
-                        closure.2.clone(),
-                        closure.3.clone(),
-                    ),
+                    ClosureVal(closure.clone()),
                 );
 
-                let res = self.eval(*body, &mut loc_venv, &mut loc_fenv);
-                res
+                println!("Evaluating body \n{}\n\n", *body);
+                println!("Environments: \n{:?}\n\n", loc_venv);
+                println!("Environments: \n{:?}\n\n", loc_fenv);
+                self.eval(*body, &mut loc_venv, &mut loc_fenv)
             }
             Exp::UnitExp => Val::UnitVal,
             _ => Val::UnitVal,

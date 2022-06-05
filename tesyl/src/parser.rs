@@ -24,7 +24,7 @@ pub struct Parser {
 impl Parser {
     pub fn new(tokens: Vec<Token>) -> Parser {
         // Debugging
-        print_tokens(&tokens);
+        //print_tokens(&tokens);
 
         Parser {
             tokens: tokens.into_iter().peekable(),
@@ -33,7 +33,7 @@ impl Parser {
 
     fn eat(&mut self, expected: &Token) {
         let actual = self.tokens.peek().expect("No token present to eat");
-        println!("Actual was: {}", actual);
+        //println!("Actual was: {}", actual);
         if expected == actual {
             self.tokens.next();
             //println!("Ate");

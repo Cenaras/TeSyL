@@ -6,12 +6,20 @@ type Id = String;
 type VarEnv = HashMap<Id, Val>;
 type FunEnv = HashMap<Id, Val>;
 
+#[derive(Clone, Debug, PartialEq)]
+pub struct Closure {
+    pub ids: Vec<Id>,
+    pub body: Box<Exp>,
+    pub venv: VarEnv,
+    pub fenv: FunEnv,
+}
+
 #[derive(PartialEq, Clone, Debug)]
 pub enum Val {
     IntVal(i32),
     BoolVal(bool),
     TupleVal(Box<Val>, Box<Val>),
-    ClosureVal(Vec<Id>, Box<Exp>, VarEnv, FunEnv),
+    ClosureVal(Closure),
     UnitVal,
 }
 
