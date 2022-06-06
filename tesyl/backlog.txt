@@ -13,3 +13,13 @@ Add Operational Semantics document, and keep up to date.
 Benchmark tests - Ackermann number.
 Refactor and optimize code - use more rust built-in features.
 
+Rewrite to Compiler
+ - Inspiration from https://github.com/antoyo/tiger-rs/tree/master/tiger/src
+ - Statements and expression instead of just expressions
+ - Add types
+    And do other static analysis
+    Maybe minimal language and NonInterference for compiler afterwards?
+    Can reuse lexer and parser I suppose
+ Probably new MR - Keep Interpreter on Old MR - switch back and forth
+ Maybe have both? Figure out - but main focus on writing compiler!
+
