@@ -1,9 +1,12 @@
 use crate::lexer::Lexer;
 use std::env;
 
+mod ast;
 mod lexer;
+mod parser;
 mod position;
 mod token;
+mod types;
 
 fn main() {
     let mut args = env::args().skip(1);

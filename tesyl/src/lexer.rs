@@ -123,7 +123,7 @@ impl Lexer {
                         break;
                     }
                 }
-                None => break
+                None => break,
             }
             // Advance, if we did not break
             self.iter.next();
@@ -134,7 +134,6 @@ impl Lexer {
             _ => TokenType::Identifier(acc),
         }
     }
-
 
     fn read_number(&mut self, cur: char) -> TokenType {
         let mut acc = String::from(cur);
