@@ -3,7 +3,7 @@ use crate::{BinOp, Exp, Val};
 use std::collections::HashMap;
 use std::env::var;
 use std::iter::zip;
-use crate::val::Closure;
+use crate::val_old::Closure;
 
 /*
    This MR: Try and restart on the interpreter, and make the struct own the maps, and
