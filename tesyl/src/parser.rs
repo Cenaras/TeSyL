@@ -181,4 +181,10 @@ impl Parser {
         self.eat(&TokenType::IntLit(value));
         return intlit;
     }
+
+    pub fn print_result(&mut self, program: &Exp) {
+        println!("AST: \n{}", program);
+    }
+
+
 }

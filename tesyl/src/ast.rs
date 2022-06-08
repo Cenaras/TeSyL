@@ -1,3 +1,5 @@
+use std::fmt::{Display, Formatter};
+
 type Id = String;
 
 pub enum Exp {
@@ -28,4 +30,25 @@ pub enum BinOp {
     MinusBinOp,
     TimesBinOp,
     DivideBinOp,
+}
+
+impl Display for Exp {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match &*self {
+            Exp::BinOpExp {left, op, right} => write!(f, "BinOpExp({} {} {})", left, op, right),
+            Exp::IntExp {value} => write!(f, "IntExp({})", value),
+            _ => write!(f, "AST Print Not Implemented")
+        }
+    }
+}
+
+impl Display for BinOp {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match &*self {
+            BinOp::PlusBinOp => write!(f, "+"),
+            BinOp::MinusBinOp => write!(f, "-"),
+            BinOp::TimesBinOp => write!(f, "*"),
+            BinOp::DivideBinOp => write!(f, "/"),
+        }
+    }
 }
