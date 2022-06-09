@@ -27,6 +27,8 @@ pub enum Exp {
 // Decls produce no value, but may change the state
 // TODO Determine if we use these - and update structure
 // so we have ASTNode with Decl and Exp as subtypes
+// FOR NOW: Let is an expression with UnitType that updates the environment
+
 pub enum Decl {
     //LetDecl { id: Id, value: Box<Exp> },
 }

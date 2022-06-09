@@ -8,6 +8,7 @@ use std::{fs, result};
 
 pub struct Lexer {
     iter: Peekable<IntoIter<char>>,
+    debug: bool,
 }
 
 type IOError = std::io::Error;
@@ -17,14 +18,14 @@ impl Lexer {
     pub fn new(filename: &str) -> Result<Lexer, IOError> {
         let data = &fs::read_to_string(filename)?;
         let iter = data.chars().collect::<Vec<_>>().into_iter().peekable();
-        Ok(Lexer { iter })
+        Ok(Lexer { iter, debug: false })
     }
 
     pub fn lex(&mut self) -> Vec<TokenType> {
         let mut tokens_list: Vec<TokenType> = vec![];
         let mut next_token = self.get_token();
         loop {
-            println!("NEXT TOKEN IS: {}", next_token);
+            //println!("NEXT TOKEN IS: {}", next_token);
             if next_token != TokenType::EOF {
                 tokens_list.push(next_token);
                 next_token = self.get_token();

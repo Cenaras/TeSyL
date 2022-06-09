@@ -10,28 +10,36 @@
 
 */
 
-/*
-   struct Context {
-       venv:
-       tenv:
-       err:
-   }
-*/
+type Id = String;
+
+struct Context {
+    venv: HashMap<Id, Type>,
+    //tenv:
+    //err:
+}
 
 use crate::ast::Exp::*;
 use crate::ast::{BinOp, Exp};
 use crate::tabsyn::TypedExp;
 use crate::types::Type;
 use crate::types::Type::{IntType, UnitType};
+use std::collections::HashMap;
+use std::iter::Map;
 
-pub struct SemanticAnalyzer {}
+pub struct SemanticAnalyzer {
+    ctxt: Context,
+}
 
 impl SemanticAnalyzer {
     pub fn new() -> Self {
-        SemanticAnalyzer {}
+        SemanticAnalyzer {
+            ctxt: Context {
+                venv: HashMap::new(),
+            },
+        }
     }
 
-    pub fn analyze(&self, exp: &Exp) -> TypedExp {
+    pub fn analyze(&mut self, exp: &Exp) -> TypedExp {
         match exp {
             IntExp { value } => TypedExp {
                 exp: IntExp { value: *value },
@@ -100,6 +108,19 @@ impl SemanticAnalyzer {
                 }
                 _ => panic!("Not implemented"), //TODO: Other BinOps
             },
+            LetExp { id, value } => {
+                let body = self.analyze(value);
+                let id_clone = id.clone();
+                //expand environment here
+                self.ctxt.venv.insert(id.parse().unwrap(), body.ty);
+                TypedExp {
+                    exp: LetExp {
+                        id: id_clone,
+                        value: Box::from(body.exp),
+                    },
+                    ty: UnitType,
+                }
+            }
 
             _ => TypedExp {
                 // TODO Implement

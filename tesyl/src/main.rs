@@ -25,7 +25,7 @@ fn main() {
     let program_exp = parser.parse_program().unwrap();
     parser.print_result(&program_exp);
 
-    let sem = SemanticAnalyzer::new();
+    let mut sem = SemanticAnalyzer::new();
     let typed_program = sem.analyze(&program_exp);
     sem.print_typed(&typed_program);
 }
