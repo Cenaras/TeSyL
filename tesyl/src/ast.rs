@@ -14,6 +14,10 @@ pub enum Exp {
     VarExp {
         id: Id,
     },
+    LetExp {
+        id: Id,
+        value: Box<Exp>,
+    },
     SeqExp {
         expr: Vec<Exp>,
     },
@@ -21,10 +25,13 @@ pub enum Exp {
 }
 
 // Decls produce no value, but may change the state
-pub enum Decls {
-    LetDecl { id: Id, value: Box<Exp> },
+// TODO Determine if we use these - and update structure
+// so we have ASTNode with Decl and Exp as subtypes
+pub enum Decl {
+    //LetDecl { id: Id, value: Box<Exp> },
 }
 
+#[derive(Clone)]
 pub enum BinOp {
     PlusBinOp,
     MinusBinOp,
@@ -35,9 +42,10 @@ pub enum BinOp {
 impl Display for Exp {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match &*self {
-            Exp::BinOpExp {left, op, right} => write!(f, "BinOpExp({} {} {})", left, op, right),
-            Exp::IntExp {value} => write!(f, "IntExp({})", value),
-            _ => write!(f, "AST Print Not Implemented")
+            Exp::BinOpExp { left, op, right } => write!(f, "BinOpExp({} {} {})", left, op, right),
+            Exp::IntExp { value } => write!(f, "IntExp({})", value),
+            Exp::LetExp { id, value } => write!(f, "LetExp({}, {})", id, value),
+            _ => write!(f, "AST Print Not Implemented"),
         }
     }
 }

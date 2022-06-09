@@ -155,7 +155,7 @@ impl Parser {
     fn primary_expr(&mut self) -> Result<Exp, ErrorType> {
         return match self.tokens.peek().unwrap() {
             TokenType::IntLit(v) => self.int_lit(),
-            //TokenType::LET => self.let_expr(),
+            TokenType::LET => self.let_expr(),
             //TokenType::Identifier(id) => self.var_expr(), // Probably also add call exp to this one later...
             TokenType::OpenBrack => self.seq_expr(),
             //TokenType::TRUE | TokenType::FALSE => self.bool_exp(),
@@ -165,6 +165,32 @@ impl Parser {
             //TokenType::FUNDEC => self.fun_dec(),
             _ => Err("Test"),
         };
+    }
+
+    fn let_expr(&mut self) -> Result<Exp, ErrorType> {
+        self.eat(&TokenType::LET);
+
+        let id = self.identifier();
+
+        self.eat(&TokenType::EQUAL);
+
+        let expr = self.expr().unwrap();
+
+        Ok(Exp::LetExp {
+            id,
+            value: Box::from(expr),
+        })
+    }
+
+    fn identifier(&mut self) -> String {
+        let id = match self.tokens.peek() {
+            Some(TokenType::Identifier(x)) => x,
+            _ => panic!("Not a identifier"),
+        };
+        let temp = id.clone();
+        let temp2 = id.clone();
+        self.eat(&TokenType::Identifier(temp));
+        temp2
     }
 
     fn int_lit(&mut self) -> Result<Exp, ErrorType> {
@@ -185,6 +211,4 @@ impl Parser {
     pub fn print_result(&mut self, program: &Exp) {
         println!("AST: \n{}", program);
     }
-
-
 }
