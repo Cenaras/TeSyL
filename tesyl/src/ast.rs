@@ -2,6 +2,7 @@ use std::fmt::{Display, Formatter};
 
 type Id = String;
 
+#[derive(Debug, Clone, PartialEq)]
 pub enum Exp {
     IntExp {
         value: u32,
@@ -33,7 +34,7 @@ pub enum Decl {
     //LetDecl { id: Id, value: Box<Exp> },
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Debug)]
 pub enum BinOp {
     PlusBinOp,
     MinusBinOp,
@@ -47,6 +48,7 @@ impl Display for Exp {
             Exp::BinOpExp { left, op, right } => write!(f, "BinOpExp({} {} {})", left, op, right),
             Exp::IntExp { value } => write!(f, "IntExp({})", value),
             Exp::LetExp { id, value } => write!(f, "LetExp({}, {})", id, value),
+            Exp::SeqExp { expr } => write!(f, "SeqExp({:?})", expr),
             _ => write!(f, "AST Print Not Implemented"),
         }
     }

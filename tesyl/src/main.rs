@@ -2,9 +2,12 @@ use crate::lexer::Lexer;
 use crate::parser::Parser;
 use crate::semantic::SemanticAnalyzer;
 use std::env;
+use crate::llvm::CFG;
 
 mod ast;
+mod ir;
 mod lexer;
+mod llvm;
 mod parser;
 mod position;
 mod semantic;
@@ -28,4 +31,7 @@ fn main() {
     let mut sem = SemanticAnalyzer::new();
     let typed_program = sem.analyze(&program_exp);
     sem.print_typed(&typed_program);
+
+    CFG::cfg_test(typed_program);
+
 }

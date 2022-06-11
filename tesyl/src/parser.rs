@@ -147,7 +147,6 @@ impl Parser {
         }
 
         self.eat(&TokenType::CloseBrack);
-
         Ok(Exp::SeqExp { expr: expressions })
     }
 
@@ -156,7 +155,7 @@ impl Parser {
         return match self.tokens.peek().unwrap() {
             TokenType::IntLit(v) => self.int_lit(),
             TokenType::LET => self.let_expr(),
-            //TokenType::Identifier(id) => self.var_expr(), // Probably also add call exp to this one later...
+            TokenType::Identifier(id) => self.var_expr(), // Probably also add call exp to this one later...
             TokenType::OpenBrack => self.seq_expr(),
             //TokenType::TRUE | TokenType::FALSE => self.bool_exp(),
             //TokenType::IF => self.if_expr(),
@@ -164,6 +163,16 @@ impl Parser {
             //TokenType::OpenParen => self.tuple_expr(),
             //TokenType::FUNDEC => self.fun_dec(),
             _ => Err("Test"),
+        };
+    }
+
+    fn var_expr(&mut self) -> Result<Exp, ErrorType> {
+        let id = self.identifier();
+
+        return match self.tokens.peek() {
+            //Some(TokenType::EQUAL) => self.assign_expr(id),
+            //Some(TokenType::OpenParen) => self.fun_call_args(id),
+            _ => Ok(Exp::VarExp { id }),
         };
     }
 
