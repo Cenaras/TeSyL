@@ -1,10 +1,10 @@
 extern crate core;
 
 use crate::lexer::Lexer;
+use crate::llvm::{CFG, CFGBuilder};
 use crate::parser::Parser;
 use crate::semantic::SemanticAnalyzer;
 use std::env;
-use crate::llvm::CFG;
 
 mod ast;
 mod ir;
@@ -34,6 +34,9 @@ fn main() {
     let typed_program = sem.analyze(&program_exp);
     sem.print_typed(&typed_program);
 
-    //CFG::cfg_test(typed_program);
+    let mut builder = CFGBuilder::new();
+    let t = builder.construct_cfg(typed_program);
+    println!("{:?}", t);
 
+    //CFG::cfg_test(typed_program);
 }

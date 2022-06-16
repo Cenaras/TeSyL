@@ -20,7 +20,7 @@ struct Context {
 
 use crate::ast::Exp::*;
 use crate::ast::{BinOp, Exp};
-use crate::tabsyn::TypedExp;
+use crate::tabsyn::{TypedExp, TypedExpBase};
 use crate::types::Type;
 use crate::types::Type::{IntType, UnitType};
 use std::collections::HashMap;
@@ -39,13 +39,12 @@ impl SemanticAnalyzer {
         }
     }
 
-
     //TODO: Composite types need to have typedexp as arguments
     // BinOp should be op two TypedExps
     pub fn analyze(&mut self, exp: &Exp) -> TypedExp {
         match exp {
             IntExp { value } => TypedExp {
-                exp: IntExp { value: *value },
+                exp: TypedExpBase::IntExp { value: *value },
                 ty: IntType,
             },
             BinOpExp { left, op, right } => match op {
@@ -54,64 +53,19 @@ impl SemanticAnalyzer {
                     let right_typed = self.analyze(&right);
                     match (left_typed.ty, right_typed.ty) {
                         (IntType, IntType) => TypedExp {
-                            exp: BinOpExp {
-                                left: Box::from(left_typed.exp),
+                            exp: TypedExpBase::BinOpExp {
+                                left: Box::from(left_typed),
                                 op: BinOp::PlusBinOp,
-                                right: Box::from(right_typed.exp),
+                                right: Box::from(right_typed),
                             },
                             ty: IntType,
                         },
                         _ => panic!("Panic"),
                     }
                 }
-                BinOp::MinusBinOp => {
-                    let left_typed = self.analyze(&left);
-                    let right_typed = self.analyze(&right);
-                    match (left_typed.ty, right_typed.ty) {
-                        (IntType, IntType) => TypedExp {
-                            exp: BinOpExp {
-                                left: Box::from(left_typed.exp),
-                                op: BinOp::MinusBinOp,
-                                right: Box::from(right_typed.exp),
-                            },
-                            ty: IntType,
-                        },
-                        _ => panic!("Error here"),
-                    }
-                }
-                BinOp::TimesBinOp => {
-                    let left_typed = self.analyze(&left);
-                    let right_typed = self.analyze(&right);
-                    match (left_typed.ty, right_typed.ty) {
-                        (IntType, IntType) => TypedExp {
-                            exp: BinOpExp {
-                                left: Box::from(left_typed.exp),
-                                op: BinOp::TimesBinOp,
-                                right: Box::from(right_typed.exp),
-                            },
-                            ty: IntType,
-                        },
-                        _ => panic!("Error here"),
-                    }
-                }
-                BinOp::DivideBinOp => {
-                    let left_typed = self.analyze(&left);
-                    let right_typed = self.analyze(&right);
-                    match (left_typed.ty, right_typed.ty) {
-                        (IntType, IntType) => TypedExp {
-                            exp: BinOpExp {
-                                left: Box::from(left_typed.exp),
-                                op: BinOp::DivideBinOp,
-                                right: Box::from(right_typed.exp),
-                            },
-                            ty: IntType,
-                        },
-                        _ => panic!("Error here"),
-                    }
-                }
                 _ => panic!("Not implemented"), //TODO: Other BinOps
             },
-            LetExp { id, value } => {
+            /*LetExp { id, value } => {
                 let body = self.analyze(value);
                 let id_clone = id.clone();
                 //expand environment here
@@ -123,11 +77,10 @@ impl SemanticAnalyzer {
                     },
                     ty: UnitType,
                 }
-            }
-
+            }*/
             _ => TypedExp {
                 // TODO Implement
-                exp: UnitExp,
+                exp: TypedExpBase::UnitExp,
                 ty: UnitType,
             },
         }
