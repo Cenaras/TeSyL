@@ -1,3 +1,5 @@
+extern crate core;
+
 use crate::lexer::Lexer;
 use crate::parser::Parser;
 use crate::semantic::SemanticAnalyzer;
@@ -32,6 +34,6 @@ fn main() {
     let typed_program = sem.analyze(&program_exp);
     sem.print_typed(&typed_program);
 
-    CFG::cfg_test(typed_program);
+    //CFG::cfg_test(typed_program);
 
 }

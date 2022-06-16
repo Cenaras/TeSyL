@@ -5,7 +5,7 @@ type Id = String;
 #[derive(Debug, Clone, PartialEq)]
 pub enum Exp {
     IntExp {
-        value: u32,
+        value: i64,
     },
     BinOpExp {
         left: Box<Exp>,

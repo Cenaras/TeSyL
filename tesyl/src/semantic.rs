@@ -39,6 +39,9 @@ impl SemanticAnalyzer {
         }
     }
 
+
+    //TODO: Composite types need to have typedexp as arguments
+    // BinOp should be op two TypedExps
     pub fn analyze(&mut self, exp: &Exp) -> TypedExp {
         match exp {
             IntExp { value } => TypedExp {

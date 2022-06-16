@@ -16,7 +16,7 @@ pub enum TokenType {
     NEQ,
     NOT,
     SEMICOLON,
-    IntLit(u32),
+    IntLit(i64),
     Identifier(String),
     LET,
     OpenParen,
