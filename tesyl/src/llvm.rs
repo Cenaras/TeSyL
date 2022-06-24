@@ -5,6 +5,8 @@ use crate::llvm::Ty::I64;
 use crate::tabsyn::{TypedExp, TypedExpBase};
 use crate::types::Type;
 
+type FreshId = &'static str;
+
 // LLVM Types - For now just simple stuff
 #[derive(Debug, Copy, Clone)]
 pub enum Ty {
@@ -18,8 +20,8 @@ pub enum Ty {
 // Copy prolly not, fix box and stuff later to get id
 #[derive(Clone, Copy, Debug)]
 pub enum Operand {
-    Const(i64), //Constants
-    Id(i32),    //Variables TODO MAKE STRING
+    Const(i64),  //Constants
+    Id(FreshId), //Variables - typically storing results
 }
 #[derive(Debug)]
 pub enum Bop {
@@ -62,14 +64,14 @@ impl BasicBlock {
         self
     }*/
 }
-
+#[derive(Debug)]
 pub struct CFG {
     initial: BasicBlock,
     blocks: Vec<BasicBlock>,
 }
 
 // Potential label to store result and the instruction
-type Instruction = (Option<String>, Instr);
+type Instruction = (Option<FreshId>, Instr);
 
 pub struct CFGBuilder {
     rev_basic_blocks: Vec<BasicBlock>,
@@ -110,7 +112,7 @@ impl CFGBuilder {
                 let right_op = self.construct_cfg(*right);
 
                 // Placeholder label for now
-                let lbl = String::from("label");
+                let lbl = "lbl";
 
                 match (ty_left, ty_right) {
                     // Case where binop between ints
@@ -133,10 +135,22 @@ impl CFGBuilder {
                         panic!("No other types")
                     }
                 }
-                // TODO: Label of binopid here
-                Operand::Id(0)
+                Operand::Id(lbl)
             }
             _ => panic!("Unimpl"),
+        }
+    }
+
+    // TODO: Undone, trying some things out
+    pub fn get_cfg(self) -> CFG {
+        let first_block = match self.first_basic_block {
+            Some(bb) => bb,
+            None => panic!("Cannot construct CFG with no entrypoint"),
+        };
+
+        CFG {
+            initial: first_block,
+            blocks: vec![],
         }
     }
 }

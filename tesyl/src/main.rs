@@ -38,5 +38,10 @@ fn main() {
     let t = builder.construct_cfg(typed_program);
     println!("{:?}", t);
 
+    // TODO: First basic block is never terminated,
+    // deal with this, and create basic blocks correctly
+    //let cfg = builder.get_cfg();
+    //println!("CFG: {:?}", cfg);
+
     //CFG::cfg_test(typed_program);
 }
