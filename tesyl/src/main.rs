@@ -1,7 +1,7 @@
 extern crate core;
 
 use crate::lexer::Lexer;
-use crate::llvm::{CFG, CFGBuilder};
+use crate::llvm::{CFGBuilder, CFG};
 use crate::parser::Parser;
 use crate::semantic::SemanticAnalyzer;
 use std::env;

@@ -1,8 +1,9 @@
-use crate::ast::Exp;
+use crate::ast::{BinOp, Exp};
 use crate::llvm::Bop::Add;
 use crate::llvm::Operand::Const;
 use crate::llvm::Ty::I64;
 use crate::tabsyn::{TypedExp, TypedExpBase};
+use crate::types::Type;
 
 // LLVM Types - For now just simple stuff
 #[derive(Debug, Copy, Clone)]
@@ -18,7 +19,7 @@ pub enum Ty {
 #[derive(Clone, Copy, Debug)]
 pub enum Operand {
     Const(i64), //Constants
-                Id(i32), //Variables TODO MAKE STRING
+    Id(i32),    //Variables TODO MAKE STRING
 }
 #[derive(Debug)]
 pub enum Bop {
@@ -99,17 +100,40 @@ impl CFGBuilder {
 
             TypedExpBase::BinOpExp { left, op, right } => {
                 // TODO: More stuff than just this - id's and stuff...
+
+                // Get types of left and right
+                let ty_left = left.ty;
+                let ty_right = right.ty;
+
+                // Recursive compute left and right, and get operand storing result of each
                 let left_op = self.construct_cfg(*left);
                 let right_op = self.construct_cfg(*right);
 
+                // Placeholder label for now
                 let lbl = String::from("label");
 
-                // Test
-                self.add_instr((
-                    Some(lbl),
-                    Instr::BinOp(Bop::Add, Ty::I64, left_op, right_op),
-                ));
+                match (ty_left, ty_right) {
+                    // Case where binop between ints
+                    (Type::IntType, Type::IntType) => {
+                        // Pretty do this instead of each branch being duplicate
+                        match op {
+                            BinOp::PlusBinOp => {
+                                self.add_instr((
+                                    Some(lbl),
+                                    Instr::BinOp(Add, I64, left_op, right_op),
+                                ));
+                            }
+                            _ => {
+                                panic!("Only add")
+                            }
+                        }
+                    }
 
+                    _ => {
+                        panic!("No other types")
+                    }
+                }
+                // TODO: Label of binopid here
                 Operand::Id(0)
             }
             _ => panic!("Unimpl"),
