@@ -1,5 +1,6 @@
 extern crate core;
 
+use crate::hoisting::hoister;
 use crate::lexer::Lexer;
 use crate::llvm::{CFGBuilder, CFG};
 use crate::parser::Parser;
@@ -7,6 +8,8 @@ use crate::semantic::SemanticAnalyzer;
 use std::env;
 
 mod ast;
+mod habsyn;
+mod hoisting;
 mod ir;
 mod lexer;
 mod llvm;
@@ -38,10 +41,27 @@ fn main() {
     let t = builder.construct_cfg(typed_program);
     println!("{:?}", t);
 
+    let typed_prog_test = sem.analyze(&program_exp);
+    hoister(typed_prog_test);
+
     // TODO: First basic block is never terminated,
     // deal with this, and create basic blocks correctly
     //let cfg = builder.get_cfg();
     //println!("CFG: {:?}", cfg);
+
+    /*
+        I believe LLVM programs are just:
+        list of type decls, list of globals, list of func
+        So init with a main function?
+
+        Hoisted AST has a "Program" with type decls
+        and fun decls also - maybe do like this?
+
+        Look hoisting.ml line 180
+
+
+
+    */
 
     //CFG::cfg_test(typed_program);
 }
