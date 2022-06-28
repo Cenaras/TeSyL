@@ -1,5 +1,5 @@
 use crate::ast::{BinOp, Exp};
-use crate::habsyn::HoistedProgram;
+use crate::habsyn::{FunDeclData, HoistedExp, HoistedExpBase, HoistedProgram};
 use crate::llvm::Bop::Add;
 use crate::llvm::Operand::Const;
 use crate::llvm::Ty::I64;
@@ -55,6 +55,7 @@ pub enum Bop {
 #[derive(Debug)]
 pub enum Instr {
     BinOp(Bop, Ty, Operand, Operand),
+    Alloca(Ty),
 }
 
 #[derive(Debug)]
@@ -67,7 +68,7 @@ pub enum Terminator {
 #[derive(Debug)]
 pub struct BasicBlock {
     label: String,
-    instructions: Vec<Instr>, // (Option(uid), instruc)
+    instructions: Vec<Instruction>, // (Option(uid), instruc)
     terminator: Terminator,
 }
 
@@ -115,13 +116,31 @@ impl CFGBuilder {
         self.rev_instr.push(instr)
     }
 
+    // Maybe we need to split the naming of block out separate from the struct?
+    // Either return cfg builder or mutate?
+    pub fn term_block(self, term: Terminator) {
+        let mut ins_list = self.rev_instr;
+        ins_list.reverse();
+
+        let bb = BasicBlock {
+            label: "name".to_string(),
+            instructions: ins_list,
+            terminator: term,
+        };
+
+        match self.first_basic_block {
+            None =>
+        }
+
+    }
+
     // Playground for now - maybe return non-mut builder
     // with updated bindings?
-    pub fn codegen_exp(&mut self, typed_prog: TypedExp) -> Operand {
-        match typed_prog.exp {
-            TypedExpBase::IntExp { value } => Const(value),
+    pub fn codegen_exp(&mut self, hoisted_prog: HoistedExp) -> Operand {
+        match hoisted_prog.exp {
+            HoistedExpBase::IntExp { value } => Const(value),
 
-            TypedExpBase::BinOpExp { left, op, right } => {
+            HoistedExpBase::BinOpExp { left, op, right } => {
                 // TODO: More stuff than just this - id's and stuff...
 
                 // Get types of left and right
@@ -160,6 +179,35 @@ impl CFGBuilder {
             }
             _ => panic!("Unimpl"),
         }
+    }
+
+    pub fn codegen_fun_decl(&mut self, fdecl: FunDeclData) -> (FreshId, FunDecl) {
+        // Note; This has to handle a lot more in the future
+
+        // Get return type of function - for now this is only main
+        let ret_ty = match fdecl.result {
+            Type::IntType => {
+                I64 // Default to I64
+            }
+            _ => panic!("Not implemented"),
+        };
+
+        // Code gen for the body
+        let body = self.codegen_exp(fdecl.body);
+
+        let test = FunDecl {
+            fun_type: (vec![], ret_ty),
+            params: vec![],
+            cfg: CFG {
+                initial: BasicBlock {
+                    label: "".to_string(),
+                    instructions: vec![],
+                    terminator: Terminator::Unreachable,
+                },
+                blocks: vec![],
+            },
+        };
+        ("main", test)
     }
 
     // TODO: Undone, trying some things out

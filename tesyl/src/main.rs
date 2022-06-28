@@ -37,15 +37,14 @@ fn main() {
     let typed_program = sem.analyze(&program_exp);
     sem.print_typed(&typed_program);
 
-    let mut builder = CFGBuilder::new();
-    let t = builder.codegen_exp(typed_program);
-    println!("{:?}", t);
+    //let mut builder = CFGBuilder::new();
+    //let t = builder.codegen_exp(typed_program);
+    //println!("{:?}", t);
 
     let typed_prog_test = sem.analyze(&program_exp);
     let hoisted = hoister(typed_prog_test);
 
     let llvm_prog = codegen_prog(hoisted);
-
 
     // TODO: First basic block is never terminated,
     // deal with this, and create basic blocks correctly
