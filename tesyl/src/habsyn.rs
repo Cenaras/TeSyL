@@ -27,6 +27,6 @@ pub struct FunDeclData {
     //locals, parent, ...
 }
 
-pub struct Program {
-    fun_decls: Vec<FunDeclData>,
+pub struct HoistedProgram {
+    pub(crate) fun_decls: Vec<FunDeclData>,
 }

@@ -1,4 +1,5 @@
 use crate::ast::{BinOp, Exp};
+use crate::habsyn::HoistedProgram;
 use crate::llvm::Bop::Add;
 use crate::llvm::Operand::Const;
 use crate::llvm::Ty::I64;
@@ -6,6 +7,26 @@ use crate::tabsyn::{TypedExp, TypedExpBase};
 use crate::types::Type;
 
 type FreshId = &'static str;
+
+// Local identifiers for functions
+type Uid = FreshId;
+
+// Global identifiers
+type Gid = FreshId;
+
+// List of arguments and return type
+type FunType = (Vec<Ty>, Ty);
+
+pub struct Program {
+    //tdecls, globals,
+    fun_decls: Vec<(Gid, FunDecl)>,
+}
+
+pub struct FunDecl {
+    fun_type: FunType,
+    params: Vec<Uid>,
+    cfg: CFG,
+}
 
 // LLVM Types - For now just simple stuff
 #[derive(Debug, Copy, Clone)]
@@ -96,7 +117,7 @@ impl CFGBuilder {
 
     // Playground for now - maybe return non-mut builder
     // with updated bindings?
-    pub fn construct_cfg(&mut self, typed_prog: TypedExp) -> Operand {
+    pub fn codegen_exp(&mut self, typed_prog: TypedExp) -> Operand {
         match typed_prog.exp {
             TypedExpBase::IntExp { value } => Const(value),
 
@@ -108,8 +129,8 @@ impl CFGBuilder {
                 let ty_right = right.ty;
 
                 // Recursive compute left and right, and get operand storing result of each
-                let left_op = self.construct_cfg(*left);
-                let right_op = self.construct_cfg(*right);
+                let left_op = self.codegen_exp(*left);
+                let right_op = self.codegen_exp(*right);
 
                 // Placeholder label for now
                 let lbl = "lbl";
@@ -155,13 +176,7 @@ impl CFGBuilder {
     }
 }
 
-impl CFG {
-    // This is just some testing stuff
-    pub fn cfg_test(texp: TypedExp) {
-        //println!("Testing from here");
-        //let mut bb = BasicBlock::new(String::from("01"));
-        //let v1 = Operand::Const(42);
-        //bb.add_instruction(Instr::BinOp(Add, I64, v1, v1));
-        //println!("The basic block is: {:?}", bb);
-    }
+// Has to call code_gen_fdecl to generate functions
+pub fn codegen_prog(program: HoistedProgram) -> Program {
+    Program { fun_decls: vec![] }
 }

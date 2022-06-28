@@ -2,7 +2,7 @@ extern crate core;
 
 use crate::hoisting::hoister;
 use crate::lexer::Lexer;
-use crate::llvm::{CFGBuilder, CFG};
+use crate::llvm::{codegen_prog, CFGBuilder, CFG};
 use crate::parser::Parser;
 use crate::semantic::SemanticAnalyzer;
 use std::env;
@@ -38,11 +38,14 @@ fn main() {
     sem.print_typed(&typed_program);
 
     let mut builder = CFGBuilder::new();
-    let t = builder.construct_cfg(typed_program);
+    let t = builder.codegen_exp(typed_program);
     println!("{:?}", t);
 
     let typed_prog_test = sem.analyze(&program_exp);
-    hoister(typed_prog_test);
+    let hoisted = hoister(typed_prog_test);
+
+    let llvm_prog = codegen_prog(hoisted);
+
 
     // TODO: First basic block is never terminated,
     // deal with this, and create basic blocks correctly

@@ -8,7 +8,8 @@
 
 */
 
-use crate::habsyn::{FunDeclData, HoistedExp, HoistedExpBase};
+use crate::habsyn::{FunDeclData, HoistedExp, HoistedExpBase, HoistedProgram};
+use crate::llvm::Program;
 use crate::tabsyn::{TypedExp, TypedExpBase};
 use crate::types::Type;
 
@@ -34,14 +35,19 @@ fn hoist_exp(exp: TypedExp) -> HoistedExp {
     }
 }
 
-pub fn hoister(exp: TypedExp) -> FunDeclData {
+pub fn hoister(exp: TypedExp) -> HoistedProgram {
     println!("YEP");
 
     let hoisted_exp = hoist_exp(exp);
 
-    FunDeclData {
+    let main = FunDeclData {
         name: "main",
         result: Type::IntType,
         body: hoisted_exp,
+    };
+    // For now, all hoister does is return program with main
+    // func, with given expression
+    HoistedProgram {
+        fun_decls: vec![main],
     }
 }
