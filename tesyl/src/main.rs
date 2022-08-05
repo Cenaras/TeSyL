@@ -24,6 +24,7 @@ mod types;
 
 fn main() {
     let mut args = env::args().skip(1);
+    // Format: samples/[name].tsl
     let filename = args.next().unwrap();
     let mut lexer = Lexer::new(&filename).unwrap();
     let tokens = lexer.lex();
@@ -37,19 +38,15 @@ fn main() {
     let typed_program = sem.analyze(&program_exp);
     sem.print_typed(&typed_program);
 
-    //let mut builder = CFGBuilder::new();
-    //let t = builder.codegen_exp(typed_program);
-    //println!("{:?}", t);
-
     let typed_prog_test = sem.analyze(&program_exp);
     let hoisted = hoister(typed_prog_test);
 
     let llvm_prog = codegen_prog(hoisted);
 
     // TODO: First basic block is never terminated,
-    // deal with this, and create basic blocks correctly
-    //let cfg = builder.get_cfg();
-    //println!("CFG: {:?}", cfg);
+    // deal with this, and create basic blocks correctly.
+    // Reason: We need hoisting to create functions, so simple programs
+    // have block termination. Otherwise, an addition never terminates the block.
 
     /*
         I believe LLVM programs are just:

@@ -6,6 +6,9 @@ use crate::llvm::Ty::I64;
 use crate::tabsyn::{TypedExp, TypedExpBase};
 use crate::types::Type;
 
+// TODO: Need a proper design choice in mutation vs non mutation, and need
+// to test a lot of things such as basic block creation.
+
 type FreshId = &'static str;
 
 // Local identifiers for functions
@@ -118,7 +121,7 @@ impl CFGBuilder {
 
     // Maybe we need to split the naming of block out separate from the struct?
     // Either return cfg builder or mutate?
-    pub fn term_block(self, term: Terminator) {
+    pub fn term_block(mut self, term: Terminator) {
         let mut ins_list = self.rev_instr;
         ins_list.reverse();
 
@@ -129,9 +132,9 @@ impl CFGBuilder {
         };
 
         match self.first_basic_block {
-            None =>
-        }
-
+            None => self.first_basic_block = Some(bb),
+            Some(block) => self.rev_basic_blocks.push(bb),
+        };
     }
 
     // Playground for now - maybe return non-mut builder
