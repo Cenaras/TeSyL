@@ -20,9 +20,10 @@ type Gid = FreshId;
 // List of arguments and return type
 type FunType = (Vec<Ty>, Ty);
 
-pub struct Program {
+// Lifetime says: The reference to the Gid, FunDecl must life as long as the Program Struct does.
+pub struct Program<'a> {
     //tdecls, globals,
-    fun_decls: Vec<(Gid, FunDecl)>,
+    pub fun_decls: Vec<&'a (Gid, FunDecl)>,
 }
 
 pub struct FunDecl {
@@ -44,9 +45,11 @@ pub enum Ty {
 // Copy prolly not, fix box and stuff later to get id
 #[derive(Clone, Copy, Debug)]
 pub enum Operand {
-    Const(i64),  //Constants
+    Const(i64),
+    //Constants
     Id(FreshId), //Variables - typically storing results
 }
+
 #[derive(Debug)]
 pub enum Bop {
     Add,
@@ -65,13 +68,14 @@ pub enum Instr {
 pub enum Terminator {
     Ret(Ty, Option<Operand>),
     Unreachable, //testing
-                 // Br lbl, Cbr op lb, lb
+    // Br lbl, Cbr op lb, lb
 }
 
 #[derive(Debug)]
 pub struct BasicBlock {
     label: String,
-    instructions: Vec<Instruction>, // (Option(uid), instruc)
+    instructions: Vec<Instruction>,
+    // (Option(uid), instruc)
     terminator: Terminator,
 }
 
@@ -89,6 +93,7 @@ impl BasicBlock {
         self
     }*/
 }
+
 #[derive(Debug)]
 pub struct CFG {
     initial: BasicBlock,
@@ -116,6 +121,7 @@ impl CFGBuilder {
     }
 
     pub fn add_instr(&mut self, instr: Instruction) {
+        println!("Adding instruction");
         self.rev_instr.push(instr)
     }
 
@@ -139,9 +145,9 @@ impl CFGBuilder {
 
     // Playground for now - maybe return non-mut builder
     // with updated bindings?
-    pub fn codegen_exp(&mut self, hoisted_prog: HoistedExp) -> Operand {
-        match hoisted_prog.exp {
-            HoistedExpBase::IntExp { value } => Const(value),
+    pub fn codegen_exp(&mut self, hoisted_prog: &HoistedExp) -> Operand {
+        match &hoisted_prog.exp {
+            HoistedExpBase::IntExp { value } => Const(*value),
 
             HoistedExpBase::BinOpExp { left, op, right } => {
                 // TODO: More stuff than just this - id's and stuff...
@@ -151,8 +157,8 @@ impl CFGBuilder {
                 let ty_right = right.ty;
 
                 // Recursive compute left and right, and get operand storing result of each
-                let left_op = self.codegen_exp(*left);
-                let right_op = self.codegen_exp(*right);
+                let left_op = self.codegen_exp(&left);
+                let right_op = self.codegen_exp(&right);
 
                 // Placeholder label for now
                 let lbl = "lbl";
@@ -184,7 +190,7 @@ impl CFGBuilder {
         }
     }
 
-    pub fn codegen_fun_decl(&mut self, fdecl: FunDeclData) -> (FreshId, FunDecl) {
+    pub fn codegen_fun_decl(&mut self, fdecl: &FunDeclData) -> (FreshId, FunDecl) {
         // Note; This has to handle a lot more in the future
 
         // Get return type of function - for now this is only main
@@ -196,7 +202,15 @@ impl CFGBuilder {
         };
 
         // Code gen for the body
-        let body = self.codegen_exp(fdecl.body);
+        let body = self.codegen_exp(&fdecl.body);
+        println!("The body: {:?}", body);
+
+
+        /*
+        This is just placeholder. As of now: No args given, return type is I64.
+        Instructions are the ones accumulated by the cfg builder.
+        Terminator is a Return of I64 with the Operand from the body
+        */
 
         let test = FunDecl {
             fun_type: (vec![], ret_ty),
@@ -204,12 +218,15 @@ impl CFGBuilder {
             cfg: CFG {
                 initial: BasicBlock {
                     label: "".to_string(),
-                    instructions: vec![],
-                    terminator: Terminator::Unreachable,
+                    instructions: self.rev_instr,
+                    terminator: Terminator::Ret(I64, Some(body)),
                 },
                 blocks: vec![],
             },
         };
+
+        //println!("Instructions in block: {:?}", self.rev_instr);
+
         ("main", test)
     }
 
@@ -225,9 +242,27 @@ impl CFGBuilder {
             blocks: vec![],
         }
     }
+
+    // Has to call code_gen_fdecl to generate functions
+    pub fn codegen_prog(&self, program: &HoistedProgram) -> Program {
+        let fun_decl_data = program.fun_decls.get(0).expect("Main function required");
+        if program.fun_decls.len() != 1 {
+            panic!("Only single function programs supported")
+        }
+        let main = self.codegen_fun_decl(fun_decl_data);
+        // Should be vec![main], but doesn't work cause of Rust.
+        Program { fun_decls: vec![] }
+    }
+
+    pub fn print_llvm_prog_debug(&self, program: &Program) {
+        let fun_decl = &program.fun_decls.get(0).unwrap().1;
+        let ret_type = &fun_decl.fun_type;
+        println!("Function type: {:?}", ret_type);
+
+        let cfg = &fun_decl.cfg;
+        let initial_block = &cfg.initial;
+        println!("Initial Basic Block: {:?}", initial_block);
+    }
 }
 
-// Has to call code_gen_fdecl to generate functions
-pub fn codegen_prog(program: HoistedProgram) -> Program {
-    Program { fun_decls: vec![] }
-}
+

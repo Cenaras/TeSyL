@@ -36,8 +36,6 @@ fn hoist_exp(exp: TypedExp) -> HoistedExp {
 }
 
 pub fn hoister(exp: TypedExp) -> HoistedProgram {
-    println!("YEP");
-
     let hoisted_exp = hoist_exp(exp);
 
     let main = FunDeclData {

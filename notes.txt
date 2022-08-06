@@ -1,0 +1,3 @@
+Decision: Rework project to Java - more understanding of language makes compiler design easier.
+Use another simpler project to learn and understand Rust better. Same goes for other languages.
+You cannot learn a new language and design a complex piece of software at the same time...

@@ -1,8 +1,10 @@
+#![allow(dead_code)]
+#![allow(unused_variables)]
 extern crate core;
 
 use crate::hoisting::hoister;
 use crate::lexer::Lexer;
-use crate::llvm::{codegen_prog, CFGBuilder, CFG};
+use crate::llvm::{CFGBuilder, CFG};
 use crate::parser::Parser;
 use crate::semantic::SemanticAnalyzer;
 use std::env;
@@ -28,20 +30,25 @@ fn main() {
     let filename = args.next().unwrap();
     let mut lexer = Lexer::new(&filename).unwrap();
     let tokens = lexer.lex();
-    lexer.print_tokens(&tokens);
+    //lexer.print_tokens(&tokens);
 
     let mut parser = Parser::new(tokens);
     let program_exp = parser.parse_program().unwrap();
-    parser.print_result(&program_exp);
+    //parser.print_result(&program_exp);
 
     let mut sem = SemanticAnalyzer::new();
     let typed_program = sem.analyze(&program_exp);
-    sem.print_typed(&typed_program);
+    //sem.print_typed(&typed_program);
 
     let typed_prog_test = sem.analyze(&program_exp);
     let hoisted = hoister(typed_prog_test);
 
-    let llvm_prog = codegen_prog(hoisted);
+    let mut cfg_builder = CFGBuilder::new();
+
+    let llvm_prog = cfg_builder.codegen_prog(&hoisted);
+
+    cfg_builder.print_llvm_prog_debug(&llvm_prog);
+
 
     // TODO: First basic block is never terminated,
     // deal with this, and create basic blocks correctly.
