@@ -23,3 +23,5 @@ Rewrite to Compiler
  Probably new MR - Keep Interpreter on Old MR - switch back and forth
  Maybe have both? Figure out - but main focus on writing compiler!
 
+Need to experiment and test the IR generation of basic blocks.
+Maybe write some LLVM simple programs (for addition) and compare.
